@@ -1,5 +1,5 @@
 # videoSellerBoard
-Coding that starts alone for the first time.
+It's a team project, but personalized coding.
 
 used skill set
 
