@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.bseven.board.mapper.BoardSQLMapperCr"> 
+	<select id="getBoardNo" resultType="int">
+		select CR_Board_seq.nextval from dual
+	
+	</select>
+	
+	<insert id="insertBoard">
+		insert into CR_Board values (
+		#{board_no}, 
+		#{member_no}, 
+		#{board_title}, 
+		#{board_content},
+		0, 
+		sysdate)
+	</insert>
+	
+	<insert id="insertBoardImage">
+		INSERT INTO CR_boardContentImage values(
+			CR_boardContentImage_seq.nextval, 
+			#{board_no}, 
+			#{bci_uri}, 
+			#{bci_originalName}, 
+			sysdate)
+	</insert>
+	
+	<select id="getBoardList" resultType="com.ja.bseven.vo.cr.CR_BoardVo">
+		SELECT * FROM (SELECT t1.*, rownum num FROM (SELECT * FROM CR_Board ORDER BY board_no desc) t1) t2 
+		WHERE <![CDATA[t2.num > (#{pageNum} - 1) * 9 AND t2.num <= #{pageNum} * 9]]>
+		
+			<choose>
+				<when test="searchOption == 'title'">
+					and board_title like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchOption == 'content'">
+					and board_content like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchOption == 'nick'">
+					and member_no in (select member_no from M_Member where member_nickname like '%' || #{searchWord} || '%')
+				</when>
+				<otherwise>
+				</otherwise>
+			</choose>
+	</select>
+	
+	<select id="getBoardImageList" resultType="com.ja.bseven.vo.cr.CR_boardContentImageVo">
+		select * from CR_boardContentImage where board_no = #{board_no}
+	</select>
+	
+	<select id="getBoardCount" resultType="int">
+		select count(*) from CR_Board
+	</select>
+	
+	<update id="updateBoardView">
+		update CR_Board set board_viewCount = board_viewCount + 1 where board_no = #{board_no}
+	</update>
+	
+	<!--  board 데이터 추출 -->
+	<select id="getBoard" resultType="com.ja.bseven.vo.cr.CR_BoardVo">
+		select * from CR_Board where board_no = #{board_no}
+	</select>
+	
+	<!-- 수정된 board db insert -->
+	<update id="updateBoard">
+		update CR_Board set board_title = #{board_title}, board_content = #{board_content} where board_no = #{board_no}
+	</update>
+	
+	<!-- board 삭제 -->
+	<delete id="deleteBoard">
+		delete from CR_Board where board_no = #{board_no}
+	</delete>
+
+	<!--  board내 리플 등록 -->
+	<insert id="insertBoardReply">
+		insert into CR_Reply values(CR_Reply_seq.nextval, #{board_no}, #{member_no}, #{reply_content}, sysdate)
+	</insert>
+	
+	<!--  board 리플 가져오기 -->
+	<select id="getBoardReplyList" resultType="com.ja.bseven.vo.cr.CR_ReplyVo">
+		select * from CR_Reply where board_no = #{board_no} order by reply_no desc
+	</select>
+	
+	<!--  리플 삭제 -->
+	<delete id="deleteReply">
+		delete from CR_Reply where reply_no = #{reply_no}
+	</delete>
+	
+	<!-- 좋아요 -->
+	<insert id="insertLike">
+		insert into CR_boardLike values (CR_boardLike_seq.nextval, #{board_no}, #{member_no}, sysdate)
+	</insert>
+	
+	<delete id="deleteLike">
+		delete from CR_boardLike where board_no = #{board_no} and member_no = #{member_no}
+	</delete>
+	
+	<select id="getLike" resultType="int">
+		select count(*) from CR_boardLike where board_no = #{board_no} and member_no = #{member_no}
+	</select>
+	
+	<select id="getLikeCount" resultType="int">
+		select count(*) from CR_boardLike where board_no = #{board_no}
+	</select>
+</mapper>
