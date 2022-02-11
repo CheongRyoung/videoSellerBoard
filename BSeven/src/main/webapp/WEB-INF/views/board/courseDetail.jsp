@@ -37,6 +37,7 @@
 <script type="text/javascript" src="/bseven/resources/js/category.js"></script>
 </head>
 <body>
+<!-- test -->
 	<div style="max-width: 1200px; margin: 0 auto;">
 		<div class="container-fluid">
 
