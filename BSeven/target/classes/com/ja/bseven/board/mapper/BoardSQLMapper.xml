@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ja.bseven.board.mapper.BoardSQLMapper">
+
+	<!-- 카테고리 리스트 가져오기  -->
+	<select id="getCategoryList" resultType="com.ja.bseven.vo.CategoryListVo">
+		select * from b7_category_list
+	</select>
+	<!--  카테고리 정보 가져오기 -->
+	<select id="getCategory" resultType="com.ja.bseven.vo.CategoryListVo">
+		select * from b7_category_list where category_no = #{category_no}
+	</select>
+	
+	<!--  강의 넘버 생성  -->
+	<select id="getCourseNum" resultType="int">
+		select b7_course_seq.nextval from dual
+	</select>
+	
+	<!--  강의 정보 넣기 -->
+	<insert id="insertCourseInfo">
+		insert into b7_course values ( #{course_no}, #{teacher_no}, #{course_title}, #{course_price} ,#{course_period}, #{course_content}, 0, sysdate)
+	</insert>
+	
+	<!--  강의 카테고리 넣기  -->
+	<insert id="insertCourseCategory">
+		insert into b7_course_category values (b7_course_category_seq.nextVal, #{course_no}, #{category_no})
+	</insert>
+	
+	<!--  강의 카테고리 불러오기 -->
+	<select id="getCourseCategoryList" resultType="com.ja.bseven.vo.CourseCategory">
+		select * from b7_course_category where course_no = #{course_no}
+	</select>
+	
+	<delete id="deleteCourseCategory">
+		delete from b7_course_category where course_no = #{course_no}
+	</delete>
+	
+	<!--  강의 동영상 넣기 -->
+	<insert id="insertCourseVideo">
+		insert into b7_course_video values (b7_course_video_seq.nextval, #{course_no}, #{course_video_title}, #{course_video_url}, #{course_video_originalfilename})
+	</insert>
+	<select id="getCourseVideo" resultType="com.ja.bseven.vo.CourseVideo">
+		select * from b7_course_video where course_no = #{course_no}
+	</select>
+	<delete id="deleteCourseVideo">
+		delete from b7_course_video where course_no = #{course_no}
+	</delete>
+	
+	
+	<!--  강의 이미지 넣기 -->
+	<insert id="insertCourseImage">
+		insert into b7_course_image values (b7_course_image_seq.nextval, #{course_no}, #{course_image_url}, #{course_image_originalName})
+	</insert>
+	
+	<!--  강의 정보 단일 리턴 -->
+	<select id="getCourseInfo" resultType="com.ja.bseven.vo.CourseVo">
+		select * from b7_course where course_no = #{course_no}
+	</select>
+	
+	<!-- 강의 정보 리스트 리턴 -->
+	<select id="getCourseInfoList" resultType="com.ja.bseven.vo.CourseVo">
+		select c2.* from (select c1.*, rownum num from (select * from b7_course where course_no = course_no
+			<choose>
+				<when test="category_name == null">
+				</when>
+				<otherwise>
+				and course_no in (select course_no from b7_course_category where category_no = (select category_no from b7_category_list where category_name = #{category_name}))
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="searchWord == null">
+				</when>
+				<otherwise>
+					and course_title like ('%'||#{searchWord}||'%')
+				</otherwise>
+			</choose>
+			order by course_no desc) c1) c2
+			
+			where <![CDATA[c2.num >= (#{pageNum} - 1) * 9 + 1 and c2.num <= #{pageNum} * 9]]>
+		
+	</select>
+	
+	<select id="getCourseInfoListBanner" resultType="com.ja.bseven.vo.CourseVo">
+		select b2.* from (select b.*, rownum num from (select * from b7_course order by course_no DESC) b) b2 <![CDATA[where b2.num <= 3]]>
+	</select>
+	
+	<!--  강의 정보 리스트 티처로 리턴 -->
+	<select id="getCourseInfoListByteacher" resultType="com.ja.bseven.vo.CourseVo">
+		select * from b7_course where teacher_no = #{teacher_no}
+	</select>
+	
+	<!--  강의 정보 삭제 -->
+	<delete id="deleteCourse">
+		delete from b7_course where course_no = #{course_no}
+	</delete>
+	
+	<!-- 강의 이미지 리스트 리턴 -->
+	<select id="getCourseImageList" resultType="com.ja.bseven.vo.CourseImage">
+		select * from b7_course_image where course_no = #{course_no}
+	</select>
+	
+	<!-- 강의 이미지 삭제 -->
+	<delete id="deleteCourseImage">
+		delete from b7_course_image where course_no = #{course_no}
+	</delete>
+	
+	<!-- 리플 저장 -->
+	<insert id="insertReply">
+		insert into b7_reply values (b7_reply_seq.nextval, #{course_no}, #{member_no}, #{reply_star}, #{reply_text}, sysdate)
+	</insert>
+	<select id="getReplyListByCourseNo" resultType="com.ja.bseven.vo.ReplyVo">
+		select * from b7_reply where course_no = #{course_no} order by reply_no desc
+	</select>
+	<select id="getReviewCount" resultType="int">
+		select count(*) from b7_reply where course_no = #{course_no} and member_no = #{member_no}
+	</select>
+	<select id="checkReplyOwner" resultType="int">
+		select count(*) from b7_reply where reply_no = #{reply_no} and member_no = #{member_no}
+	</select>
+	
+	<delete id="deleteReply">
+		delete from b7_reply where reply_no = #{reply_no}
+	</delete>
+	
+	<select id="getReplyVoByReplyNo" resultType="com.ja.bseven.vo.ReplyVo">
+		select * from b7_reply where reply_no = #{reply_no}
+	</select>
+	<update id="updateReview">
+		update b7_reply set reply_star= #{reply_star}, reply_text=#{reply_text} where reply_no = #{reply_no}
+	</update>
+</mapper>
