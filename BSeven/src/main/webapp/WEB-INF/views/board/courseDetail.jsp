@@ -14,12 +14,59 @@
 	rel="stylesheet"
 	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
 	crossorigin="anonymous">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 <title>Document</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script
-	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script>
+// 별점 구현
+function color(num) {
+    const checkStar = document.querySelectorAll(".checkStar");
+    const star = document.querySelectorAll(".star");
+    const chooseWord = document.querySelector("#chooseWord");
+    starNum = num;
+    
+    for(var i=0; i<checkStar.length; i++){
+        star[i].classList.remove("redStar");
+    }
+    for(var i=0; i<num; i++){
+        star[i].classList.add("redStar");
+    }
+
+    switch(num) {
+    case 1:  // if (x === 'value1')
+      chooseWord.style.color = 'red';
+      chooseWord.innerText = "1점 별로에요";
+      break;
+
+    case 2:  // if (x === 'value2')
+    chooseWord.style.color = 'red';
+      chooseWord.innerText = "2점 그저그래요";
+      break;
+
+    case 3:  // if (x === 'value2')
+    chooseWord.style.color = 'red';
+    chooseWord.innerText = "3점 괜찮아요";
+    break;
+
+    case 4:  // if (x === 'value2')
+    chooseWord.style.color = 'red';
+    chooseWord.innerText = "4점 좋아요";
+    break;
+
+    case 5:  // if (x === 'value2')
+    chooseWord.style.color = 'red';
+    chooseWord.innerText = "5점 최고에요";
+    break;
+    }
+}
+
+    
+   window.addEventListener("DOMContentLoaded", e => {
+   	reviewRefresh();
+    })
+</script>
 <style>
 .star {
 	font-size: 2rem;
@@ -37,7 +84,6 @@
 <script type="text/javascript" src="/bseven/resources/js/category.js"></script>
 </head>
 <body>
-<!-- test -->
 	<div style="max-width: 1200px; margin: 0 auto;">
 		<div class="container-fluid">
 
@@ -57,7 +103,7 @@
 							<img src="/uploadFolder2/${courseData.image }" id="image"
 								class="img-fluid img-thumbnail" style="height: 300px;">
 						</div>
-						<!-- 1차 예제 수준으로 따로 설명 x select만 해오면 됩니다. -->
+						
 						<div class="col-md-12 col-lg-6 d-grid">
 							<div class="row">
 								<div class="col">
@@ -95,26 +141,26 @@
 								</div>
 							</div>
 							<div class="row text-center">
-								<div class="col-2">
+								<div class="col-3">
 									<c:choose>
 										<c:when test="${wishNum > 0 }">
-											<a onclick="wishState()"><i class="bi bi-heart-fill fs-3"
-												id="heart"></i></a>
+											<i class="bi bi-heart-fill fs-3" onclick="wishState()"
+												id="heart"></i>
 										</c:when>
 										<c:otherwise>
-											<a onclick="wishState()"><i class="bi bi-heart fs-3"
-												id="heart"></i></a>
+											<i class="bi bi-heart fs-3" onclick="wishState()"
+												id="heart"></i>
 										</c:otherwise>
 									</c:choose>
+									<i class="bi bi-bar-chart-line fs-3 m-3" onclick="openChart()"></i>
 								</div>
 								<div class="col">
-									<button onclick="addCart()" class="btn btn-outline-primary">장바구니</button>
-
 									<c:choose>
 										<c:when test="${orderNum > 0 }">
 											<a class="btn btn-primary disabled">이미 구매하였습니다.</a>
 										</c:when>
 										<c:otherwise>
+											<button onclick="addCart()" class="btn btn-outline-primary">장바구니</button>
 											<button class="btn btn-outline-primary" onclick="orderMoal()">구매하기</button>
 										</c:otherwise>
 									</c:choose>
@@ -147,242 +193,18 @@
 			<jsp:include page="../commons/global_footer.jsp"></jsp:include>
 		</div>
 	</div>
-
-	<!-- Modal -->
-	<div class="modal fade" id="exampleModal" tabindex="-1"
-		aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-body" id="modalBox"></div>
-				<div class="modal-footer">
-					<button onclick="hideModal()">닫기</button>
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- orderPage source -->
-	<div id="orderPage" class="d-none">
-		<div class="row my-5">
-			<div class="col-1"></div>
-			<div class="col">
-				<div class="row">
-					<div class="col">
-						<h1 style="font-weight: bold; font-size: x-large;">결제 정보</h1>
-					</div>
-				</div>
-				<div class="row mt-4">
-					<div class="col">
-						<p>선택한 강의</p>
-						<div class="row"
-							style="border: 1px solid #bdbdbd; border-radius: 5px;">
-							<div class="col p-5 pb-3 cartDataBox"></div>
-						</div>
-					</div>
-				</div>
-				<div class="row mt-5">
-					<div class="col-6">
-						<p>주문자 정보</p>
-						<div class="row"
-							style="border-top: 1px solid #bdbdbd; border-bottom: 1px solid #bdbdbd;">
-							<div class="col">
-								<div class="row p-3 pb-0">
-									<div class="col-3">
-										<p style="margin: 0;">주문자명</p>
-									</div>
-									<div class="col d-grid">
-										<input type="text" class="sessionUserNick">
-									</div>
-								</div>
-								<div class="row p-3 pb-0">
-									<div class="col-3">
-										<p style="margin: 0;">전화번호</p>
-									</div>
-									<div class="col d-grid">
-										<input type="text" class="sessionUserPhone">
-									</div>
-								</div>
-								<div class="row p-3">
-									<div class="col-3">
-										<p style="margin: 0;">이메일</p>
-									</div>
-									<div class="col d-grid">
-										<input type="text" class="sessionUserEmail">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-1"></div>
-					<div class="col">
-						<p>결제 수단</p>
-						<div class="row p-3" style="border: 1px solid #bdbdbd">
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="Radios"
-									id="Radios1" value="계좌이체"> <label
-									class="form-check-label" for="Radios1"> 계좌이체 </label>
-
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="Radios"
-									id="Radios2" value="카드결제"> <label
-									class="form-check-label" for="Radios2"> 카드결제 </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="Radios"
-									id="Radios3" value="무통장입금"> <label
-									class="form-check-label" for="Radios3"> 무통장입금 </label>
-							</div>
-						</div>
-						<div class="row mt-1">
-							<div class="col d-grid">
-								<button class="btn btn-primary" data-bs-dismiss="modal">취소하기</button>
-							</div>
-							<div class="col d-grid">
-								<button type="button" class="btn btn-primary"
-									onclick="orderProcess(cart_no_arr, course_no_arr)">결제하기</button>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-			<div class="col-1"></div>
-		</div>
-	</div>
-
-
-	<!-- 카트 반복문용 태크 -->
-	<div class="d-none" id="selectCartData">
-		<div class="row my-2 py-2" style="border-bottom: 1px solid #bdbdbd;">
-			<input type="hidden" name="course_no" value=""
-				class="cartDataCourse_no"> <input type="hidden"
-				name="cart_no" value="" class="cartDataCart_no">
-			<div class="col-3 cartDataCourse_title">제목</div>
-			<div class="col-5 categoryBox">카테고리로 for문</div>
-			<div class="col-2 cartDataTeacherName">강사명</div>
-			<div class="col-2 sale cartDataCourse_price">금액</div>
-		</div>
-	</div>
-
-	<!--  reviewPage source -->
-	<div id="reviewPage" class="d-none">
-		<div class="row my-5">
-			<div class="col-1"></div>
-			<div class="col">
-				<h1 class="fw-bold">후기 등록</h1>
-				<div class="row mt-5 p-4">
-					<div class="col">
-						<!-- 강의 정보 -->
-						<div class="row pb-4" style="border-bottom: #e0e0e0 10px solid;">
-							<!-- 강의 썸네일 -->
-							<div class="col">
-								<img class="img-fluid" id="reviewImgBox">
-							</div>
-							<!-- 강의 요약 -->
-							<div class="col d-grid mt-3">
-								<div class="row text-start">
-									<div class="col-md-3">
-										<span>강의제목: </span>
-									</div>
-									<div class="col">
-										<span id="reviewTitleBox"></span>
-									</div>
-								</div>
-								<div class="row text-start">
-									<div class="col-md-3">
-										<span>강사명: </span>
-									</div>
-									<div class="col">
-										<span id="reviewTeacherBox"> </span>
-									</div>
-								</div>
-								<div class="row text-start">
-									<div class="col-md-3">
-										<span>카테고리: </span>
-									</div>
-									<div class="col" id="reviewCategoryBox"></div>
-								</div>
-								<div class="row text-start">
-									<div class="col-md-3">
-										<span>가격: </span>
-									</div>
-									<div class="col" id="reviewPriceBox"></div>
-								</div>
-							</div>
-						</div>
-						<!-- 별점 -->
-						<div class="row mt-3">
-							<div class="col text-center">
-								<span>강의는 만족하셨나요?</span>
-							</div>
-						</div>
-						<div class="row text-center">
-							<div class="col">
-								<label class="star" for="star1" onclick="color(1)">★</label><input
-									type="radio" class="checkStar" value="1"> <label
-									class="star" for="star2" onclick="color(2)">★</label><input
-									type="radio" class="checkStar" value="2"> <label
-									class="star" for="star3" onclick="color(3)">★</label><input
-									type="radio" class="checkStar" value="3"> <label
-									class="star" for="star4" onclick="color(4)">★</label><input
-									type="radio" class="checkStar" value="4"> <label
-									class="star" for="star5" onclick="color(5)">★</label><input
-									type="radio" class="checkStar" value="5">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col text-center">
-								<span style="font-size: small; color: #bdbdbd" id="chooseWord">선택해주세요</span>
-							</div>
-						</div>
-
-						<div class="row mt-3">
-							<div class="coltext-center d-grid">
-								<textarea placeholder="강의평을 작성해주세요" id="reply_text"></textarea>
-							</div>
-						</div>
-						<div class="row text-end mt-3">
-							<div class="col" id="reviewButtonBox">
-								<button type="button" class="btn btn-outline-primary" onclick="insertReview()">후기 등록</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-1"></div>
-		</div>
-	</div>
-
-	<!-- reviewboard -->
-	<div id="reviewBoardset" class="d-none">
-		<div class="row">
-			<div class="col">
-				<div class="row my-2 ">
-					<div class="col-8 reviewBoardMemberNick">${replyData.memberVo.member_nickname }</div>
-					<div class="col-2 p-0 reviewBoardDate">
-						<fmt:formatDate value="${replyData.replyVo.reply_date }"
-							pattern="yyyy-MM-dd hh:mm" />
-					</div>
-					<div class="col-2 text-end reviewControl btn-group btn-group-sm">
-					</div>
-				</div>
-				<div class="row my-2">
-					<div class="col reviewBoardText">${replyData.replyVo.reply_text }</div>
-					<div class="col-2 text-end reviewBoardStar">
-						<span style="color: yellow" class="yellowStar"></span><span
-							style="color: #ddd" class="emptyStar"></span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
+	
+	<jsp:include page="../commons/modalData.jsp"></jsp:include>
+	
+	
 	<script type="text/javascript">
 	
 	var myModalEl = document.querySelector('#exampleModal');
+	myModalEl.addEventListener('hidden.bs.modal', function (event) {
+		var modalBox = document.getElementById("modalBox")
+		modalBox.innerHTML = "";
+		})
+	
 	
 	var cart_no_arr = new Array();
 	var course_no_arr = new Array();
@@ -456,7 +278,7 @@
 				var reviews = document.querySelectorAll("#reviewSection > div");
 					for(var i=0; i<reviews.length; i++) {
 						if ( (i+1)%2 == 0) {
-							reviews[i].style.backgroundColor = "#ddd";
+							reviews[i].style.backgroundColor = "#dddd";
 						}
 					}
 			}
@@ -753,60 +575,133 @@
 		}
 	
 	</script>
+	<script type="text/javascript">
+	
+	function openChart() {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState==4 && xhr.status==200){
+				var restApidata = JSON.parse(xhr.responseText);
+				var maleRestApidata = restApidata.chartData.ageMaleDataList;
+				var fmaleRestApidata = restApidata.chartData.ageFemaleDataList;
+				
+				var maledata = [0, 0, 0, 0, 0, 0];
+				var fmaledata = [0, 0, 0, 0, 0, 0];
+				
+				for (male of maleRestApidata){
+					if ( male.AGE < 20) {
+						maledata[0] = maledata[0] + male.CNT;
+					} else if( male.AGE < 30) {
+						maledata[1] = maledata[1] + male.CNT;
+					} else if( male.AGE < 40) {
+						maledata[2] = maledata[2] + male.CNT;
+					} else if( male.AGE < 50) {
+						maledata[3] = maledata[3] + male.CNT;
+					} else if( male.AGE < 50) {
+						maledata[4] = maledata[4] + male.CNT;
+					} else {
+						maledata[5] = maledata[5] + male.CNT;
+					}
+				}
+				
+				for (female of fmaleRestApidata){
+					if ( female.AGE < 20) {
+						fmaledata[0] = fmaledata[0] + female.CNT;
+					} else if( male.AGE < 30) {
+						fmaledata[1] = fmaledata[1] + female.CNT;
+					} else if( male.AGE < 40) {
+						fmaledata[2] = fmaledata[2] + female.CNT;
+					} else if( male.AGE < 50) {
+						fmaledata[3] = fmaledata[3] + female.CNT;
+					} else if( male.AGE < 50) {
+						fmaledata[4] = fmaledata[4] + female.CNT;
+					} else {
+						fmaledata[5] = fmaledata[5] + female.CNT;
+					}
+				}		
+				
+				const labels = ['10대', '20대', '30대', '40대', '50대', '60대'];
+				const data = {
+				  labels: labels,
+				  datasets: [{
+				    label: 'Male',
+				    data: maledata,
+				    backgroundColor: [
+				      'rgba(255, 99, 132, 0.2)',
+				      'rgba(255, 99, 132, 0.2)',
+				      'rgba(255, 99, 132, 0.2)',
+				      'rgba(255, 99, 132, 0.2)',
+				      'rgba(255, 99, 132, 0.2)',
+				      'rgba(255, 99, 132, 0.2)'
+				    ],
+				    borderColor: [
+				      'rgb(255, 99, 132)',
+				      'rgb(255, 99, 132)',
+				      'rgb(255, 99, 132)',
+				      'rgb(255, 99, 132)',
+				      'rgb(255, 99, 132)',
+				      'rgb(255, 99, 132)'
+				      
+				    ],
+				    borderWidth: 1
+				  },
+		          {
+				    label: 'Female',
+				    data: fmaledata,
+				    backgroundColor: [
+				      'rgba(255, 159, 64, 0.2)',
+				      'rgba(255, 159, 64, 0.2)',
+				      'rgba(255, 159, 64, 0.2)',
+				      'rgba(255, 159, 64, 0.2)',
+				      'rgba(255, 159, 64, 0.2)',
+				      'rgba(255, 159, 64, 0.2)'
+				    ],
+				    borderColor: [
+				      'rgb(255, 159, 64)',
+				      'rgb(255, 159, 64)',
+				      'rgb(255, 159, 64)',
+				      'rgb(255, 159, 64)',
+				      'rgb(255, 159, 64)',
+				      'rgb(255, 159, 64)'
+				    ],
+				    borderWidth: 1
+				  }]
+				};
+				
+				const config = {
+						  type: 'bar',
+						  data: data,
+						  options: {
+						    scales: {
+						      y: {
+						        beginAtZero: true
+						      }
+						    }
+						  },
+						};
 
-	<script>
-    // 별점 구현
-function color(num) {
-    const checkStar = document.querySelectorAll(".checkStar");
-    const star = document.querySelectorAll(".star");
-    const chooseWord = document.querySelector("#chooseWord");
-    starNum = num;
-    
-    for(var i=0; i<checkStar.length; i++){
-        star[i].classList.remove("redStar");
-    }
-    for(var i=0; i<num; i++){
-        star[i].classList.add("redStar");
-    }
+				var modalBox = document.getElementById("modalBox");
+				var chartBox = document.getElementById("chartBox");
+				var cloneChartBox = chartBox.firstElementChild.cloneNode(true);
+				modalBox.append(cloneChartBox);
+				var cloneCanvas = document.querySelector("#modalBox canvas")
+				cloneCanvas.id = 'myChart1';
+				
 
-    switch(num) {
-    case 1:  // if (x === 'value1')
-      chooseWord.style.color = 'red';
-      chooseWord.innerText = "1점 별로에요";
-      break;
+				var myChart = new Chart(
+					    document.getElementById('myChart1'),
+					    config
+					  );
 
-    case 2:  // if (x === 'value2')
-    chooseWord.style.color = 'red';
-      chooseWord.innerText = "2점 그저그래요";
-      break;
+				var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+				modal.show();
+			}
+		}
+		xhr.open("get", "./getCourseChartData?course_no=" + courseNum, true);
+		xhr.send();
+		
+	}
 
-    case 3:  // if (x === 'value2')
-    chooseWord.style.color = 'red';
-    chooseWord.innerText = "3점 괜찮아요";
-    break;
-
-    case 4:  // if (x === 'value2')
-    chooseWord.style.color = 'red';
-    chooseWord.innerText = "4점 좋아요";
-    break;
-
-    case 5:  // if (x === 'value2')
-    chooseWord.style.color = 'red';
-    chooseWord.innerText = "5점 최고에요";
-    break;
-    }
-}
-
-    
-    window.addEventListener("DOMContentLoaded", e => {
-    	reviewRefresh();
-    })
-</script>
-
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-		crossorigin="anonymous"></script>
-
+	</script>
 </body>
 </html>

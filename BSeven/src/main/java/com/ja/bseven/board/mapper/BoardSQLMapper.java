@@ -1,6 +1,7 @@
 package com.ja.bseven.board.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -71,4 +72,8 @@ public interface BoardSQLMapper {
 	public void deleteReply(int reply_no);
 	public ReplyVo getReplyVoByReplyNo(int reply_no);
 	public void updateReview(ReplyVo replyVo);
+	
+	// chart
+	public ArrayList<HashMap<String, Object>> getChartOrderByGenderM(int course_no);
+	public ArrayList<HashMap<String, Object>> getChartOrderByGenderF(int course_no);
 }

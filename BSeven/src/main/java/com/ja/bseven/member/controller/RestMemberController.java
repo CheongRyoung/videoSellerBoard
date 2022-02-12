@@ -138,4 +138,11 @@ public class RestMemberController {
 		data.put("result", "complete");
 		return data;
 	}
+	
+	@RequestMapping("myReviewRefresh")
+	public HashMap<String, Object> myReviewRefresh(){
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		
+		return data;
+	}
 }

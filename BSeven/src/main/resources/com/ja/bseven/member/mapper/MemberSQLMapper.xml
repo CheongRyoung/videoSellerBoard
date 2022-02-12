@@ -29,8 +29,8 @@
 		select count(*) from b7_teacher where member_no = #{member_no}
 	</select>
 	
-	<select id="getTeacherNoByMemberno" resultType="int">
-		select teacher_no from b7_teacher where member_no = #{member_no}
+	<select id="getTeacherNoByMemberno" resultType="com.ja.bseven.vo.TeacherVo">
+		select * from b7_teacher where member_no = #{member_no}
 	</select>
 	
 	<select id="getTeacherName" resultType="com.ja.bseven.vo.MemberVo">

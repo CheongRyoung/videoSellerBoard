@@ -1,6 +1,7 @@
 package com.ja.bseven.member.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -21,7 +22,7 @@ public interface MemberSQLMapper {
 	// 강사 관리 
 	public void insertTeacherToSQL(TeacherVo teacherVo);
 	public int getTeacherCheck(int member_no);
-	public int getTeacherNoByMemberno(int member_no);
+	public TeacherVo getTeacherNoByMemberno(int member_no);
 	public MemberVo getTeacherName(int teacher_no);
 	
 	// 카트 관리

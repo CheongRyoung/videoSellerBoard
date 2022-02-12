@@ -143,4 +143,12 @@ public class RestBoardController {
 		data.put("result", "success");
 		return data;
 	}
+	
+	@RequestMapping("getCourseChartData")
+	public HashMap<String, Object> getCourseChartData(int course_no){
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("chartData", boardService.getChartData(course_no));
+		
+		return data;
+	}
 }

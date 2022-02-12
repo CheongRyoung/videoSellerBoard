@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,7 @@ public class BoardService {
 		int course_no = boardSQLMapper.getCourseNum();
 		
 		//강의 정보 등록
-		int teacher_no = memberSQLMapper.getTeacherNoByMemberno(member_no);
+		int teacher_no = memberSQLMapper.getTeacherNoByMemberno(member_no).getTeacher_no();
 		courseVo.setTeacher_no(teacher_no);
 		courseVo.setCourse_no(course_no);
 		boardSQLMapper.insertCourseInfo(courseVo);
@@ -137,6 +138,7 @@ public class BoardService {
 		for (ReplyVo replyVo : replyList) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			MemberVo memberVo = memberSQLMapper.getMemberByNo(replyVo.getMember_no());
+			
 			map.put("replyVo", replyVo);
 			map.put("memberVo", memberVo);
 			replyDataList.add(map);
@@ -210,5 +212,12 @@ public class BoardService {
 	}
 	public void updateReview(ReplyVo replyVo) {
 		boardSQLMapper.updateReview(replyVo);
+	}
+	
+	public HashMap<String, Object> getChartData(int course_no){
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("ageMaleDataList", boardSQLMapper.getChartOrderByGenderM(course_no));
+		data.put("ageFemaleDataList", boardSQLMapper.getChartOrderByGenderF(course_no));
+		return data;
 	}
 }

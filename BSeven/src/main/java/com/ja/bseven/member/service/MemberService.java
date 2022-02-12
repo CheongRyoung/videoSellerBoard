@@ -278,7 +278,7 @@ public class MemberService {
 	
 	public ArrayList<HashMap<String, Object>> getMyUploadDataList(int member_no) {
 		ArrayList<HashMap<String, Object>> myUploadDataList = new ArrayList<HashMap<String,Object>>();
-		int teacher_no = memberSQLMapper.getTeacherNoByMemberno(member_no);
+		int teacher_no = memberSQLMapper.getTeacherNoByMemberno(member_no).getTeacher_no();
 		
 		ArrayList<CourseVo> courseInfoListByteacher = boardSQLMapper.getCourseInfoListByteacher(teacher_no);
 		for (CourseVo courseVo : courseInfoListByteacher) {
