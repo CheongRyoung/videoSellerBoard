@@ -1,5 +1,6 @@
 # videoSellerBoard
 It's a team project, but personalized coding.
+For personal learning.
 
 used skill set
 
