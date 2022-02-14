@@ -102,25 +102,19 @@ public class RestBoardController {
 	@RequestMapping("reviewRefresh")
 	public HashMap<String, Object> reviewRefresh(int course_no, HttpSession session){
 		HashMap<String, Object> data = new HashMap<String, Object>();
-		int reviewCount = 0;
+		
 		MemberVo sessionUser = (MemberVo) session.getAttribute("sessionUser");
-		OrderVo orderVo = new OrderVo();
-		if ( sessionUser != null ) {
-			data.put("login", true);
-			data.put("sessionUser", sessionUser.getMember_no());
-			reviewCount = boardService.getReviewCount(course_no, sessionUser.getMember_no());
-			orderVo.setCourse_no(course_no);
-			orderVo.setMember_no(sessionUser.getMember_no());
-			HashMap<String, Object> orderData = memberService.getOrderCount(orderVo);
-			if ( orderData == null || reviewCount > 0) {
+		if(sessionUser != null) {
+			int reviewCount = boardService.getReviewCount(course_no, sessionUser.getMember_no());
+			int orderCount = memberService.getOrderCheck(course_no, sessionUser.getMember_no());
+			if(reviewCount > 0 || orderCount == 0) {
 				data.put("result", "existence");
-			} else {
-				data.put("result", "success");
+				data.put("sessionUser", sessionUser.getMember_no());
 			}
 		} else {
 			data.put("result", "existence");
-			data.put("sessionUser", 0);
 		}
+		
 		HashMap<String, Object> courseData = boardService.getCourseInfo(course_no);
 		data.put("courseData", courseData);
 

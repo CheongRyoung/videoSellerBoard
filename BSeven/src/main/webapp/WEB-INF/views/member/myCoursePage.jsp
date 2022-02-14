@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<jsp:useBean id="now" class="java.util.Date" />
+<fmt:formatDate value="${now}" pattern="yyyy-MM-dd" var="now" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +79,15 @@
 												pattern="yyyy-MM-dd" /></span>
 									</div>
 									<div class="col-1">
-										<button class="showinfo" value="${myCourseData.courseVo.course_no }">&#9661;</button>
+										<fmt:formatDate value="${myCourseData.expire }" pattern="yyyy-MM-dd" var="expire"/>
+									<c:choose>
+										<c:when test="${expire >= now }">
+											<button class="showinfo" value="${myCourseData.courseVo.course_no }">&#9661;</button>
+										</c:when>
+										<c:otherwise>
+											<p class="showinfo">만료</p>
+										</c:otherwise>
+									</c:choose>
 									</div>
 								</div>
 								
@@ -148,11 +158,6 @@
     		                  headTitleSpan.innerText = "강의제목";
     		                  headTitle.append(headTitleSpan);
 
-    		              const headLength = document.createElement("div");
-    		              headLength.setAttribute("class", "col");
-    		                  const headLengthSpan = document.createElement("span");
-    		                  headLengthSpan.innerText = "강의길이";
-    		                  headLength.append(headLengthSpan);
 
     		              const headShow = document.createElement("div");
     		              headShow.setAttribute("class", "col");
@@ -161,7 +166,7 @@
     		                  headShow.append(headShowSpan);
     		          
 
-    		          videoHead.append(headNo, headTitle, headLength, headShow);
+    		          videoHead.append(headNo, headTitle, headShow);
     		          videoDiv.append(videoHead);
     		          videoSection.append(videoDiv);
 
@@ -186,16 +191,6 @@
     		                  bodyTitleSpan.innerText = map.videoList[j].course_video_title;
     		                  bodyTitle.append(bodyTitleSpan);
 
-    		              let bodyLength = document.createElement("div");
-    		              bodyLength.setAttribute("class", "col");
-    		                  let bodyLengthVideo = document.createElement("video");
-    		                  bodyLengthVideo.setAttribute("src", "http://localhost:8123/uploadFolder2/"+map.videoList[j].course_video_url);
-    		                  bodyLengthVideo.setAttribute("style", "display: none;");
-    		                  let bodyLengthSpan = document.createElement("div");
-    		                  bodyLengthSpan.innerText = "00:00";
-    		                  bodyLength.append(bodyLengthVideo);
-    		                  bodyLength.append(bodyLengthSpan);
-
     		              let bodyShow = document.createElement("div");
     		              bodyShow.setAttribute("class", "col");
     		                  let bodyShowA = document.createElement("a");
@@ -207,7 +202,7 @@
     		                  bodyShowA.innerText = "수강";
     		                  bodyShow.append(bodyShowA);
 
-    		          videoBody.append(bodyNo, bodyTitle, bodyLength, bodyShow);
+    		          videoBody.append(bodyNo, bodyTitle, bodyShow);
     		          videoDiv.appendChild(videoBody);
     		          }
 

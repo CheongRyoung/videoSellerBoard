@@ -13,6 +13,8 @@ import com.ja.bseven.vo.WishlistVo;
 
 public interface MemberSQLMapper {
 
+	public int idcheck(String member_id);
+	
 	public void joinMember(MemberVo vo);				// insert 쿼리는 정보를 입력
 	
 	public MemberVo getMemberByIdAndPw(MemberVo vo);	// select 쿼리는 받은 정보 확인
@@ -45,6 +47,12 @@ public interface MemberSQLMapper {
 	public int getOrderCheck(
 			@Param("course_no") int course_no, 
 			@Param("member_no") int member_no);
+	public void updateOrder(
+			@Param("course_no") int course_no, 
+			@Param("member_no") int member_no,
+			@Param("course_period") int course_period			
+			);
+	
 	
 	// 위시리스트 관리
 	public void insertWishlistVo(WishlistVo wishlistVo);

@@ -131,6 +131,13 @@
 		update b7_reply set reply_star= #{reply_star}, reply_text=#{reply_text} where reply_no = #{reply_no}
 	</update>
 	
+	<select id="getReplyVoByMemNoCourseNo" resultType="com.ja.bseven.vo.ReplyVo">
+		select * from b7_reply where course_no = #{course_no} and member_no = #{member_no}
+	</select>
+	
+	
+	<!--  chart data -->
+	
 	<select id="getChartOrderByGenderM" resultType="map">
 		SELECT age, count(*) AS cnt FROM (SELECT  trunc((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(bm.MEMBER_BIRTH, 'YYYY') )+1, -1) AS age FROM B7_MEMBER bm WHERE bm.MEMBER_GENDER = 'M' AND member_no IN (SELECT MEMBER_NO FROM B7_ORDER WHERE course_no = #{course_no})) GROUP BY age
 	</select>

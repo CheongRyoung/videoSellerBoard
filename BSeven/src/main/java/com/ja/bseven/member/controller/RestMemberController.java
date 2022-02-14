@@ -14,6 +14,7 @@ import com.ja.bseven.member.service.MemberService;
 import com.ja.bseven.vo.CartVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.MemberVo;
+import com.ja.bseven.vo.OrderVo;
 import com.ja.bseven.vo.WishlistVo;
 
 @RestController
@@ -22,6 +23,35 @@ public class RestMemberController {
 	
 	@Autowired
 	private MemberService memberService;
+	
+	@RequestMapping("idcheck")
+	public HashMap<String, Object> idcheck(String member_id) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		int check = memberService.idcheck(member_id);
+		if(check > 0) {
+			data.put("result", "fail");
+			return data;
+		} else {
+			data.put("result", "empty");
+			return data;
+		}
+		
+	}
+	
+	
+	
+	@RequestMapping("getLoginInfo")
+	public HashMap<String, Object> getLoginInfo(HttpSession session) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		MemberVo sessionUser = (MemberVo) session.getAttribute("sessionUser");
+		if(sessionUser == null) {
+			data.put("result", "fail");
+		} else {
+			data.put("result", "success");
+			data.put("member_no", sessionUser.getMember_no());
+		}
+		return data;
+	}
 	
 	@RequestMapping("addWishlistProcess")
 	public HashMap<String, Object> addWishlistProcess(int course_no, HttpSession session) {
@@ -57,15 +87,22 @@ public class RestMemberController {
 	public HashMap<String, Object> addCartProcess(int course_no, HttpSession session) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		
-		
 		CartVo cartVo = new CartVo();
 		cartVo.setCourse_no(course_no);
 		
 		MemberVo memberVo = (MemberVo) session.getAttribute("sessionUser");
-		cartVo.setMember_no(memberVo.getMember_no());
 		
-		memberService.insertCartVo(cartVo);
-		return map;
+		if (memberVo != null) {
+			cartVo.setMember_no(memberVo.getMember_no());
+			memberService.insertCartVo(cartVo);
+			map.put("result", "success");
+			return map;
+		} else {
+			map.put("result", "fail");
+			return map;
+		}
+		
+		
 	}
 	
 	@RequestMapping("deleteCartProcess")
@@ -133,7 +170,6 @@ public class RestMemberController {
 		
 		MemberVo memberVo = (MemberVo) session.getAttribute("sessionUser");
 		int member_no = memberVo.getMember_no();
-		
 		memberService.insertOrderVo(course_no, cart_no, member_no);
 		data.put("result", "complete");
 		return data;
@@ -142,6 +178,31 @@ public class RestMemberController {
 	@RequestMapping("myReviewRefresh")
 	public HashMap<String, Object> myReviewRefresh(){
 		HashMap<String, Object> data = new HashMap<String, Object>();
+		
+		return data;
+	}
+	
+	@RequestMapping("refreshMyOrderBox")
+	public HashMap<String, Object> refreshMyOrderBox(int member_no) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		
+		ArrayList<HashMap<String, Object>> myOrderDataList = memberService.getMyCourseDataList(member_no);
+		data.put("myOrderDataList", myOrderDataList);
+		
+		return data;
+	}
+	
+	@RequestMapping("deleteWishAferOrder")
+	public HashMap<String, Object> deleteWishAferOrder(int course_no, HttpSession session){
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		MemberVo sessionUser = (MemberVo) session.getAttribute("sessionUser");
+		
+		WishlistVo wishlistVo = new WishlistVo(); 
+		if (sessionUser != null) {
+			wishlistVo.setMember_no(sessionUser.getMember_no());
+			wishlistVo.setCourse_no(course_no);
+		}
+		boolean check =  memberService.checkWishlistVo(wishlistVo);
 		
 		return data;
 	}

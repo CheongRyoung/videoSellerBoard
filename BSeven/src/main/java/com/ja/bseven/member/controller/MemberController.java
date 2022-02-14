@@ -59,7 +59,7 @@ public class MemberController {
 		
 		memberService.joinMember(param);
 		
-		return "member/joinMemberComplete";
+		return "board/mainPage";
 	}
 	
 	

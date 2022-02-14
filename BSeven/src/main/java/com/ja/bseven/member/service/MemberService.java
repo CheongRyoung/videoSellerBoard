@@ -19,6 +19,7 @@ import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.MemberVo;
 import com.ja.bseven.vo.OrderVo;
+import com.ja.bseven.vo.ReplyVo;
 import com.ja.bseven.vo.TeacherVo;
 import com.ja.bseven.vo.WishlistVo;
 
@@ -31,6 +32,10 @@ public class MemberService {
 	
 	@Autowired
 	private BoardSQLMapper boardSQLMapper; 
+	
+	public int idcheck(String member_id) {
+		return memberSQLMapper.idcheck(member_id);
+	}
 	
 	public void joinMember(MemberVo vo) {
 		
@@ -139,11 +144,19 @@ public class MemberService {
 	public void insertOrderVo(int[] course_no, int[] cart_no, int member_no) {
 		
 		for(int i=0; i<course_no.length; i++) {
-			OrderVo orderVo = new OrderVo();
-			orderVo.setMember_no(member_no);
-			orderVo.setCourse_no(course_no[i]);
-			memberSQLMapper.insertOrderVo(orderVo);
-			memberSQLMapper.deleteCartVo(cart_no[i]);
+			int checkOrderCount = memberSQLMapper.getOrderCheck(course_no[i], member_no);
+			
+			if (checkOrderCount == 0 ) {
+				OrderVo orderVo = new OrderVo();
+				orderVo.setMember_no(member_no);
+				orderVo.setCourse_no(course_no[i]);
+				memberSQLMapper.insertOrderVo(orderVo);
+				memberSQLMapper.deleteCartVo(cart_no[i]);
+			} else {
+				CourseVo courseVo = boardSQLMapper.getCourseInfo(course_no[i]);
+				memberSQLMapper.updateOrder(course_no[i], member_no, courseVo.getCourse_period());
+				memberSQLMapper.deleteCartVo(cart_no[i]);
+			}
 		}
 	}
 	
@@ -202,6 +215,9 @@ public class MemberService {
 			    cal.add(Calendar.DATE, courseVo.getCourse_period());
 			    Date expire = new Date(cal.getTimeInMillis());
 			    
+			    int replyCount = boardSQLMapper.getReviewCount(courseVo.getCourse_no(), member_no);
+			    ReplyVo replyVo = boardSQLMapper.getReplyVoByMemNoCourseNo(courseVo.getCourse_no(), member_no);
+			    
 			    ArrayList<CourseVideo> courseVideoList = boardSQLMapper.getCourseVideo(courseVo.getCourse_no());
 			    
 			    ArrayList<CourseCategory> courseCategoryList = boardSQLMapper.getCourseCategoryList(courseVo.getCourse_no());
@@ -210,6 +226,8 @@ public class MemberService {
 					categoryName.add(boardSQLMapper.getCategory(courseCategory.getCategory_no()).getCategory_name());
 				}
 				
+				map.put("replyCount", replyCount);
+				map.put("replyVo", replyVo);
 				map.put("orderVo", orderVo);
 				map.put("categoryName", categoryName);
 			    map.put("courseVo", courseVo);

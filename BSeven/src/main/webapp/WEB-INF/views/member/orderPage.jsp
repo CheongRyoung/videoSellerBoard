@@ -36,6 +36,11 @@
                     <div class="row mt-4">
                         <div class="col">
                             <p>선택한 강의</p>
+                            <div class="row mt-2">
+						<div class="col">
+							<p class="text-danger">재구매시 수강기간이 연장됩니다</p>
+						</div>
+					</div>
                             <div class="row" style="border: 1px solid #bdbdbd; border-radius: 5px;">
                                 <div class="col p-5 pb-3">
                                     <c:forEach items="${selectCartDataList }" var="CartData">

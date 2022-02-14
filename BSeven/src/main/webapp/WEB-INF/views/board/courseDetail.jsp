@@ -14,11 +14,16 @@
 	rel="stylesheet"
 	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
 	crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 <title>Document</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+	crossorigin="anonymous"></script>
 <script>
 // 별점 구현
 function color(num) {
@@ -103,7 +108,7 @@ function color(num) {
 							<img src="/uploadFolder2/${courseData.image }" id="image"
 								class="img-fluid img-thumbnail" style="height: 300px;">
 						</div>
-						
+
 						<div class="col-md-12 col-lg-6 d-grid">
 							<div class="row">
 								<div class="col">
@@ -141,29 +146,21 @@ function color(num) {
 								</div>
 							</div>
 							<div class="row text-center">
-								<div class="col-3">
+								<div class="col-4">
 									<c:choose>
 										<c:when test="${wishNum > 0 }">
 											<i class="bi bi-heart-fill fs-3" onclick="wishState()"
 												id="heart"></i>
 										</c:when>
 										<c:otherwise>
-											<i class="bi bi-heart fs-3" onclick="wishState()"
-												id="heart"></i>
+											<i class="bi bi-heart fs-3" onclick="wishState()" id="heart"></i>
 										</c:otherwise>
 									</c:choose>
 									<i class="bi bi-bar-chart-line fs-3 m-3" onclick="openChart()"></i>
 								</div>
 								<div class="col">
-									<c:choose>
-										<c:when test="${orderNum > 0 }">
-											<a class="btn btn-primary disabled">이미 구매하였습니다.</a>
-										</c:when>
-										<c:otherwise>
-											<button onclick="addCart()" class="btn btn-outline-primary">장바구니</button>
-											<button class="btn btn-outline-primary" onclick="orderMoal()">구매하기</button>
-										</c:otherwise>
-									</c:choose>
+									<button onclick="addCart()" class="btn btn-outline-primary">장바구니</button>
+									<button class="btn btn-outline-primary" onclick="orderMoal()">구매하기</button>
 								</div>
 							</div>
 						</div>
@@ -179,9 +176,7 @@ function color(num) {
 						<div class="col p-2">
 							<i class="bi bi-chat"></i> <span>후기(</span><span id="reviewCount">${fn:length(courseData.replyDataList) })</span>
 						</div>
-						<div class="col p-2 text-end" id="reviewBoardOpendiv">
-
-						</div>
+						<div class="col p-2 text-end" id="reviewBoardOpendiv"></div>
 					</div>
 					<div class="row">
 						<div class="col" id="reviewSection"></div>
@@ -193,10 +188,10 @@ function color(num) {
 			<jsp:include page="../commons/global_footer.jsp"></jsp:include>
 		</div>
 	</div>
-	
+
 	<jsp:include page="../commons/modalData.jsp"></jsp:include>
-	
-	
+
+
 	<script type="text/javascript">
 	
 	var myModalEl = document.querySelector('#exampleModal');
@@ -218,8 +213,7 @@ function color(num) {
 				var date = JSON.parse(xhr.responseText);
 				var reviewSection = document.getElementById("reviewSection");
 				reviewSection.innerHTML = "";
-				
-				
+				console.log(date.result);
 				if(date.result != 'existence') {
 					var reviewBoardOpendiv = document.getElementById("reviewBoardOpendiv");
 					reviewBoardOpendiv.innerHTML = "";
@@ -230,6 +224,9 @@ function color(num) {
 					reviewButton.setAttribute("onclick", "reviewModal("+${courseData.courseVo.course_no }+")");
 					reviewButton.innerText = "후기 등록";
 					reviewBoardOpendiv.append(reviewButton);
+				} else {
+					var reviewBoardOpendiv = document.getElementById("reviewBoardOpendiv");
+					reviewBoardOpendiv.innerHTML = "";
 				}
 				
 				var reviewCount = document.getElementById("reviewCount");
@@ -382,6 +379,7 @@ function color(num) {
 					alert("오류가 발생했습니다.")
 				}
 			}
+			location.reload();
 		}
 		xhr.open("post", "../member/orderProcess", true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
@@ -567,7 +565,12 @@ function color(num) {
 			xhr2.onreadystatechange = function(){
 				if(xhr2.readyState==4 && xhr2.status==200){
 					var map2 = JSON.parse(xhr2.responseText);
-					alert("장바구니에 담겼습니다.")
+					
+					if(map2.result == 'fail') {
+						alert("로그인해주세요");
+					} else {
+						alert("장바구니에 담겼습니다.")
+					}
 				}
 			}
 			xhr2.open("get", "../member/addCartProcess?course_no=" + ${courseData.courseVo.course_no }, true);

@@ -72,6 +72,10 @@ public interface BoardSQLMapper {
 	public void deleteReply(int reply_no);
 	public ReplyVo getReplyVoByReplyNo(int reply_no);
 	public void updateReview(ReplyVo replyVo);
+	public ReplyVo getReplyVoByMemNoCourseNo(
+			@Param("course_no") int course_no,
+			@Param("member_no") int member_no
+			);
 	
 	// chart
 	public ArrayList<HashMap<String, Object>> getChartOrderByGenderM(int course_no);
