@@ -176,6 +176,10 @@ public class BoardService {
 
 	}
 	
+	public void addCourseViewCount(int course_no) {
+		boardSQLMapper.addCourseViewCount(course_no);
+	}
+	
 	public ArrayList<String> mainBannerImageList() {
 		
 		ArrayList<CourseVo> courseVoList = boardSQLMapper.getCourseInfoListBanner();

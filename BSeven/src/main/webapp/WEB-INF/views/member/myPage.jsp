@@ -345,13 +345,18 @@ function color(num) {
 <!-- 카트 반복문용 태크 -->
 <div class="d-none" id="selectCartData">
 	<div class="row my-2 py-2" style="border-bottom: 1px solid #bdbdbd;">
-		<input type="hidden" name="course_no" value=""
-			class="cartDataCourse_no"> <input type="hidden"
-			name="cart_no" value="" class="cartDataCart_no">
-		<div class="col-3 cartDataCourse_title">제목</div>
-		<div class="col-5 categoryBox">카테고리로 for문</div>
-		<div class="col-2 cartDataTeacherName">강사명</div>
-		<div class="col-2 sale cartDataCourse_price">금액</div>
+		<div class="col">
+			<div class="row">
+				<input type="hidden" name="course_no" value=""
+					class="cartDataCourse_no"> <input type="hidden"
+					name="cart_no" value="" class="cartDataCart_no">
+				<div class="col-3 cartDataCourse_title">제목</div>
+				<div class="col-4 categoryBox">카테고리로 for문</div>
+				<div class="col-2 cartDataTeacherName">강사명</div>
+				<div class="col-2 sale cartDataCourse_price">금액</div>
+				<div class="col-1 rePurchase">구매</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -685,6 +690,14 @@ function orderMoal(num){
 					var cartDataCourse_price = document.querySelector("#modalBox .cartDataCourse_price");
 					var tempPrice = CartData.courseVo.course_price
 					cartDataCourse_price.innerText = tempPrice.toLocaleString() + "원";
+					var rePurchase = document.querySelector("#modalBox .rePurchase");
+					if(CartData.orderCheck == 'new') {
+						rePurchase.innerText = "구매";
+					} else {
+						rePurchase.innerText = "재구매";
+						rePurchase.setAttribute("style", "color: red;");
+					}
+					
 				}
 				var orderAccessButton = document.querySelector("#modalBox .orderAccessButton");
 				orderAccessButton.setAttribute("onclick", "orderProcess("+cart_no_arr+", "+course_no_arr+")");

@@ -213,7 +213,6 @@ function color(num) {
 				var date = JSON.parse(xhr.responseText);
 				var reviewSection = document.getElementById("reviewSection");
 				reviewSection.innerHTML = "";
-				console.log(date.result);
 				if(date.result != 'existence') {
 					var reviewBoardOpendiv = document.getElementById("reviewBoardOpendiv");
 					reviewBoardOpendiv.innerHTML = "";
@@ -347,6 +346,13 @@ function color(num) {
 					var cartDataCourse_price = document.querySelector("#modalBox .cartDataCourse_price");
 					var tempPrice = CartData.courseVo.course_price
 					cartDataCourse_price.innerText = tempPrice.toLocaleString() + "원";
+					var rePurchase = document.querySelector("#modalBox .rePurchase");
+					if(CartData.orderCheck == 'new') {
+						rePurchase.innerText = "구매";
+					} else {
+						rePurchase.innerText = "재구매";
+						rePurchase.setAttribute("style", "color: red;");
+					}
 				}
 				var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
 				modal.show();

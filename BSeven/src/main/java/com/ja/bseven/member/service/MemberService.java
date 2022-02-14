@@ -127,6 +127,13 @@ public class MemberService {
 			for(CourseCategory courseCategory : courseCategoryList) {
 				categoryName.add(boardSQLMapper.getCategory(courseCategory.getCategory_no()).getCategory_name());
 			}
+			int orderCount = memberSQLMapper.getOrderCheck(cartVo.getCourse_no(), cartVo.getMember_no());
+			if (orderCount > 0) {
+				map.put("orderCheck", "ext");
+			} else {
+				map.put("orderCheck", "new");
+			}
+			
 			map.put("categoryName", categoryName);
 			map.put("cartVo", cartVo);
 			
@@ -192,6 +199,18 @@ public class MemberService {
 	
 	public int getOrderCheck(int course_no, int member_no) {
 		return memberSQLMapper.getOrderCheck(course_no, member_no);
+	}
+	
+	public void deleteCartVoByOrder(int[] course_no, int[] cart_no, int member_no) {
+		for(int i=0; i<course_no.length; i++) {
+			CartVo cartVo = new CartVo();
+			cartVo.setCourse_no(course_no[i]);
+			cartVo.setMember_no(member_no);
+			int cartCheck = memberSQLMapper.getCartCount(cartVo);
+			if(cartCheck > 0) {
+				memberSQLMapper.deleteCartVo(cart_no[i]);
+			}
+		}
 	}
 	
 	public ArrayList<HashMap<String, Object>> getMyCourseDataList(int member_no) {
@@ -337,5 +356,7 @@ public class MemberService {
 	public void refundOrder(OrderVo orderVo) {
 		memberSQLMapper.refundOrder(orderVo);
 	}
+	
+	
 		
 }

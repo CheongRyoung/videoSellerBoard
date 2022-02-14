@@ -171,6 +171,7 @@ public class RestMemberController {
 		MemberVo memberVo = (MemberVo) session.getAttribute("sessionUser");
 		int member_no = memberVo.getMember_no();
 		memberService.insertOrderVo(course_no, cart_no, member_no);
+		memberService.deleteCartVoByOrder(course_no, cart_no, member_no);
 		data.put("result", "complete");
 		return data;
 	}

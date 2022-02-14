@@ -33,5 +33,31 @@
 	<context:component-scan base-package="com.ja.bseven.*.controller" />
 	
 	<!-- 인터셉터 주석 이후에 추가 -->
-	
+	<interceptors>
+		<interceptor>
+			<mapping path="/board/*"/>
+			<exclude-mapping path="/board/mainPage"/>
+			<exclude-mapping path="/board/refreshMain"/>
+			<exclude-mapping path="/board/reviewRefresh"/>
+			<exclude-mapping path="/board/courseDetail"/>
+			<beans:bean class="com.ja.bseven.interceptor.AuthInterceptor"></beans:bean>
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/member/*"/>
+			<exclude-mapping path="/member/joinMemberComplete"/>
+			<exclude-mapping path="/member/joinMemberPage"/>
+			<exclude-mapping path="/member/loginReq"/>
+			<exclude-mapping path="/member/loginProcess"/>
+			<exclude-mapping path="/member/loginFail"/>
+			<exclude-mapping path="/member/addCartProcess"/>
+			<exclude-mapping path="/member/directOrder"/>
+			<beans:bean class="com.ja.bseven.interceptor.AuthInterceptor"></beans:bean>
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/commons/*"/>
+			<beans:bean class="com.ja.bseven.interceptor.AuthInterceptor"></beans:bean>
+		</interceptor>
+	</interceptors>
 </beans:beans>

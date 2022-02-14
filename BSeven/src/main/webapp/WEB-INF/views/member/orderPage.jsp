@@ -45,12 +45,20 @@
                                 <div class="col p-5 pb-3">
                                     <c:forEach items="${selectCartDataList }" var="CartData">
                                     <div class="row my-2 py-2" style="border-bottom: 1px solid #bdbdbd;">
-                                    	<input type="hidden" name="course_no" value="${CartData.courseVo.course_no}">
-                                    	<input type="hidden" name="cart_no" value="${CartData.cartVo.cart_no}">
+                                    	<input type="hidden" class="course_no" value="${CartData.courseVo.course_no}">
+                                    	<input type="hidden" class="cart_no" value="${CartData.cartVo.cart_no}">
                                         <div class="col-3" >${CartData.courseVo.course_title } </div>
-                                        <div class="col-5"><c:forEach items="${CartData.categoryName }" var="categoryName">${categoryName } </c:forEach> </div>
+                                        <div class="col-4"><c:forEach items="${CartData.categoryName }" var="categoryName">${categoryName } </c:forEach> </div>
                                         <div class="col-2">${CartData.teacherName}</div>
                                         <div class="col-2 sale"><fmt:formatNumber pattern="#,###" value="${CartData.courseVo.course_price }"/>원</div>
+                                        <c:choose>
+                                        	<c:when test="${CartData.orderCheck == 'ext'}">
+                                        		<div class="col-1 rePurchase" style="color: red;">재구매</div>
+                                        	</c:when>
+                                        	<c:otherwise>
+                                        		<div class="col-1 rePurchase" style="color: green;">구매</div>
+                                        	</c:otherwise>
+                                        </c:choose>
                                     </div>
                                     </c:forEach>
                                     
@@ -116,7 +124,7 @@
                             </div>
                             <div class="row mt-1">
                                   <div class="col d-grid"><a href="./cartPage" class="btn btn-primary">취소하기</a></div>
-                                  <div class="col d-grid"><input type="submit" value="결제하기" class="btn btn-primary"></div>
+                                  <div class="col d-grid"><button type="button" onclick="orderProcess()" class="btn btn-primary">결제하기</button></div>
                             </div>
                         </div>
                     </div>
@@ -135,6 +143,37 @@
   if(document.querySelector("#inputUrl") != null) {
 	  const inputUrl = document.querySelector("#inputUrl");
 	  inputUrl.value = url.substring(url.indexOf(/bseven/)+8);
+  }
+  
+  function orderProcess() {
+     var queryString = "";
+	  
+	  var course_no = document.querySelectorAll(".course_no");
+	  var cart_no = document.querySelectorAll(".cart_no");
+	  for (var i=0; i<course_no.length; i++){
+		  queryString = queryString + "course_no=" +course_no[i].value + "&"
+		  queryString = queryString + "cart_no=" +cart_no[i].value + "&"
+	  }
+	  
+	  
+	  var xhr = new XMLHttpRequest();
+	  
+	  xhr.onreadystatechange = function(){
+		  if(xhr.readyState==4 && xhr.status==200){
+			 var data = JSON.parse(xhr.responseText);
+			 if(data.result == 'complete'){
+				 if(confirm("구매가 완료되었습니다.")){
+					 location.href = "../member/myCoursePage";
+				 } else {
+					 location.href = "../board/mainPage";
+				 }
+				 
+			 }
+		  }
+	  }
+	  xhr.open("post", "../member/orderProcess", true);
+	  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	  xhr.send(queryString);
   }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>

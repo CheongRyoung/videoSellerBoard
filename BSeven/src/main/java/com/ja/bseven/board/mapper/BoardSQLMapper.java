@@ -41,6 +41,8 @@ public interface BoardSQLMapper {
 	public ArrayList<CourseVideo> getCourseVideo(int course_no);
 	public void deleteCourseVideo(int course_no);
 	
+	// 조회수
+	public void addCourseViewCount(int course_no);
 	
 	// 강의 정보 단일 가져오기
 	public CourseVo getCourseInfo(int course_no);

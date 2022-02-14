@@ -8,11 +8,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -144,7 +148,37 @@ public class BoardController {
 	
 	
 	@RequestMapping("courseDetail")
-	public String courseDetail(int course_no, Model model, HttpSession session) {
+	public String courseDetail(
+			int course_no, 
+			Model model, 
+			HttpSession session, 
+			HttpServletResponse response,
+			HttpServletRequest request) {
+		
+		boolean cookieHas = false;
+		
+		Cookie[] cookies = request.getCookies();
+		if(cookies != null) {
+			for(Cookie cookie : cookies) {
+				String name = cookie.getName();
+				String value = cookie.getValue();
+				if("boardView".equals(name) && value.contains("|" + course_no + "|")) {
+					cookieHas = true;
+					break;
+				} 
+			}
+		}
+		
+		if(!cookieHas) {
+			Cookie cookie = new Cookie("boardView", "boardView|" + course_no + "|");
+			cookie.setMaxAge(-1);
+			response.addCookie(cookie);
+			boardService.addCourseViewCount(course_no);
+		}
+		
+		
+		
+		
 		HashMap<String, Object> courseData = boardService.getCourseInfo(course_no);
 		model.addAttribute("courseData", courseData);
 		
@@ -186,4 +220,5 @@ public class BoardController {
 		boardService.insertReply(replyVo);
 		return "/board/completeReview";
 	}
+	
 }

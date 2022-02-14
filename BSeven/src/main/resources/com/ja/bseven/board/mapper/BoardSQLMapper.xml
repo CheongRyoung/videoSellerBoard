@@ -54,6 +54,11 @@
 		insert into b7_course_image values (b7_course_image_seq.nextval, #{course_no}, #{course_image_url}, #{course_image_originalName})
 	</insert>
 	
+	<!-- 조회수 카운트 -->
+	<update id="addCourseViewCount">
+		update b7_course set course_count = course_count + 1 where course_no = #{course_no}
+	</update>
+	
 	<!--  강의 정보 단일 리턴 -->
 	<select id="getCourseInfo" resultType="com.ja.bseven.vo.CourseVo">
 		select * from b7_course where course_no = #{course_no}
