@@ -70,6 +70,7 @@ function color(num) {
     
    window.addEventListener("DOMContentLoaded", e => {
    	reviewRefresh();
+   	checkCart();
     })
 </script>
 <style>
@@ -159,7 +160,7 @@ function color(num) {
 									<i class="bi bi-bar-chart-line fs-3 m-3" onclick="openChart()"></i>
 								</div>
 								<div class="col">
-									<button onclick="addCart()" class="btn btn-outline-primary">장바구니</button>
+									<button onclick="addCart()" data-bs-toggle="tooltip" data-bs-original-title="Hooray!" class="btn btn-outline-primary" id="cartBox">장바구니</button>
 									<button class="btn btn-outline-primary" onclick="orderMoal()">구매하기</button>
 								</div>
 							</div>
@@ -198,8 +199,7 @@ function color(num) {
 	myModalEl.addEventListener('hidden.bs.modal', function (event) {
 		var modalBox = document.getElementById("modalBox")
 		modalBox.innerHTML = "";
-		})
-	
+		})	
 	
 	var cart_no_arr = new Array();
 	var course_no_arr = new Array();
@@ -525,7 +525,6 @@ function color(num) {
 		xhr.send(reviewSting);
 		
 	}
-	
 	</script>
 	<script>
 		const url = window.location.href;
@@ -565,17 +564,44 @@ function color(num) {
 			xhr.open("get", "../member/addWishlistProcess?course_no=" + ${courseData.courseVo.course_no }, true);
 			xhr.send();
 		}
+		
+		
+		var cartBox = document.getElementById("cartBox");
+		var tooltip = bootstrap.Tooltip.getOrCreateInstance(cartBox);
+		
+		function checkCart() {
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function() {
+				if(xhr.readyState==4&&xhr.status==200){
+					var data = JSON.parse(xhr.responseText);
+					if(data.result == "true") {
+						cartBox.setAttribute("data-bs-original-title", "장바구니에 담겨있습니다.");
+					} else {
+						cartBox.setAttribute("data-bs-original-title", "장바구니에 담아보세요!");
+					}
+				}
+			}
+			xhr.open("get", "../member/checkCartProcess?course_no=" + ${courseData.courseVo.course_no }, true);
+			xhr.send();
+			
+		}
+		
 	
 		function addCart() {
+			var tooltip2 = bootstrap.Tooltip.getInstance(cartBox);
+			tooltip2.hide();
 			var xhr2 = new XMLHttpRequest();
 			xhr2.onreadystatechange = function(){
 				if(xhr2.readyState==4 && xhr2.status==200){
 					var map2 = JSON.parse(xhr2.responseText);
-					
 					if(map2.result == 'fail') {
 						alert("로그인해주세요");
+					} else if(map2.result == 'existence')  {
+						alert("장바구니에 이미 담겨있습니다.")
 					} else {
-						alert("장바구니에 담겼습니다.")
+						cartBox.setAttribute("data-bs-original-title", "장바구니에 담았습니다.");
+						alert("장바구니에 담겼습니다.");
+						tooltip2.show();
 					}
 				}
 			}

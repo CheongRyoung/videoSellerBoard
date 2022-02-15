@@ -176,9 +176,6 @@ public class BoardController {
 			boardService.addCourseViewCount(course_no);
 		}
 		
-		
-		
-		
 		HashMap<String, Object> courseData = boardService.getCourseInfo(course_no);
 		model.addAttribute("courseData", courseData);
 		

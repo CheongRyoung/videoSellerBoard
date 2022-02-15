@@ -83,6 +83,24 @@ public class RestMemberController {
 		return map;
 	}
 	
+	@RequestMapping("checkCartProcess")
+	public HashMap<String, Object> checkCartProcess(int course_no, HttpSession session) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		CartVo cartVo = new CartVo();
+		cartVo.setCourse_no(course_no);
+		
+		MemberVo memberVo = (MemberVo) session.getAttribute("sessionUser");
+		cartVo.setMember_no(memberVo.getMember_no());
+		if(memberService.checkCartVo(cartVo)) {
+			data.put("result", "true");
+			return data;
+		} else {
+			data.put("result", "false");
+			return data;
+		}
+		
+	}
+	
 	@RequestMapping("addCartProcess")
 	public HashMap<String, Object> addCartProcess(int course_no, HttpSession session) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -94,9 +112,14 @@ public class RestMemberController {
 		
 		if (memberVo != null) {
 			cartVo.setMember_no(memberVo.getMember_no());
-			memberService.insertCartVo(cartVo);
-			map.put("result", "success");
-			return map;
+			if(memberService.insertCartVo(cartVo)) {
+				map.put("result", "success");
+				return map;
+			} else {
+				map.put("result", "existence");
+				return map;
+			}
+			
 		} else {
 			map.put("result", "fail");
 			return map;

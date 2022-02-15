@@ -64,14 +64,23 @@ public class MemberService {
 		}
 	}
 	
-	public void insertCartVo(CartVo cartVo) {
+	public boolean insertCartVo(CartVo cartVo) {
 		if (memberSQLMapper.getCartCount(cartVo) > 0) {
-			
+			return false;
 		}  else {
 			memberSQLMapper.insertCartVo(cartVo);
+			return true;
 		}
 		
 		
+	}
+	
+	public boolean checkCartVo(CartVo cartVo) {
+		if(memberSQLMapper.getCartCount(cartVo) > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public ArrayList<HashMap<String, Object>> getCartDataList(int member_no){
