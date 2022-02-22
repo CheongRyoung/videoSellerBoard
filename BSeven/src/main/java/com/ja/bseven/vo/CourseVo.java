@@ -12,13 +12,15 @@ public class CourseVo {
 	private String course_content;
 	private int course_count;
 	private Date course_date;
+	private String course_map;
+	private String course_mapDetail;
 	
 	public CourseVo() {
 		super();
 	}
 
 	public CourseVo(int course_no, int teacher_no, String course_title, int course_price, int course_period,
-			String course_content, int course_count, Date course_date) {
+			String course_content, int course_count, Date course_date, String course_map, String course_mapDetail) {
 		super();
 		this.course_no = course_no;
 		this.teacher_no = teacher_no;
@@ -28,6 +30,8 @@ public class CourseVo {
 		this.course_content = course_content;
 		this.course_count = course_count;
 		this.course_date = course_date;
+		this.course_map = course_map;
+		this.course_mapDetail = course_mapDetail;
 	}
 
 	public int getCourse_no() {
@@ -93,6 +97,24 @@ public class CourseVo {
 	public void setCourse_date(Date course_date) {
 		this.course_date = course_date;
 	}
+
+	public String getCourse_map() {
+		return course_map;
+	}
+
+	public void setCourse_map(String course_map) {
+		this.course_map = course_map;
+	}
+
+	public String getCourse_mapDetail() {
+		return course_mapDetail;
+	}
+
+	public void setCourse_mapDetail(String course_mapDetail) {
+		this.course_mapDetail = course_mapDetail;
+	}
 	
+		
+
 	
 }

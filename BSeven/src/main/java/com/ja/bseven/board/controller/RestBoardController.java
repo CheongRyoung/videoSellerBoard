@@ -1,20 +1,30 @@
 package com.ja.bseven.board.controller;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ja.bseven.board.service.BoardService;
+import com.ja.bseven.board.util.FolderCreater;
 import com.ja.bseven.member.mapper.MemberSQLMapper;
 import com.ja.bseven.member.service.MemberService;
+import com.ja.bseven.vo.CourseImage;
+import com.ja.bseven.vo.CourseLectureDayVo;
+import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.MemberVo;
 import com.ja.bseven.vo.OrderVo;
 import com.ja.bseven.vo.ReplyVo;
@@ -145,4 +155,46 @@ public class RestBoardController {
 		
 		return data;
 	}
+	
+	@RequestMapping("offCourseUploadProcess")
+	public HashMap<String, Object> offCourseUploadProcess(
+			CourseVo courseVo, 
+			int[] category_no, 
+			MultipartFile[] thumbnail,
+			String[] lectureDay_title,
+			@DateTimeFormat(pattern = "yyyy-MM-dd")
+			Date[] lectureDay_date,
+			String[] lectureDay_hhmm,
+			HttpSession session) {
+		
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		
+		MemberVo sessionUser = (MemberVo) session.getAttribute("sessionUser");
+		
+		List<CourseImage> imageList = new ArrayList<CourseImage>();
+		for(MultipartFile img : thumbnail) {
+			UUID uuid = UUID.randomUUID();
+			String ext = img.getOriginalFilename().substring(img.getOriginalFilename().lastIndexOf("."));
+			String urlName = FolderCreater.getCreateFolder() + uuid.toString() + "_" + System.currentTimeMillis() + ext;
+			CourseImage corseImage = new CourseImage(0, 0, urlName, img.getOriginalFilename());
+			imageList.add(corseImage);
+			try {
+				img.transferTo(new File(FolderCreater.uploadfolder + urlName));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		List<CourseLectureDayVo> courseLectureDayVoList = new ArrayList<CourseLectureDayVo>();
+		for(int i=0; i<lectureDay_title.length; i++) {
+			CourseLectureDayVo courseLectureDayVo = new CourseLectureDayVo(0, 0, lectureDay_title[i], lectureDay_date[i], lectureDay_hhmm[i]);
+			courseLectureDayVoList.add(courseLectureDayVo);
+		}
+
+		boardService.offCourseUploadProcess(courseVo, courseLectureDayVoList, category_no, imageList, sessionUser.getMember_no());
+		data.put("result", "success");
+		
+		return data;
+	}
+	
 }

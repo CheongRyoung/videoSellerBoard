@@ -93,6 +93,12 @@
 	<update id="updateOrder">
 		update b7_order set order_date = order_date + #{course_period}, order_refund_text = null, order_refund_date = null where course_no = #{course_no} and member_no = #{member_no}
 	</update>
+	<select id="getOrderVoByCourseNoMemberNo" resultType="com.ja.bseven.vo.OrderVo">
+		select * from b7_order where course_no = #{course_no} and member_no = #{member_no}
+	</select>
+		<update id="updateOrderNow">
+		update b7_order set order_date = sysdate, order_refund_text = null, order_refund_date = null where course_no = #{course_no} and member_no = #{member_no}
+	</update>
 	
 	<!--  wishlist 관리 -->
 	<insert id="insertWishlistVo">

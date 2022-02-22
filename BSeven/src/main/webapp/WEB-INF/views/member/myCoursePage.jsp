@@ -45,7 +45,7 @@
 					<div class="row mt-5 border-bottom border-3 py-2 border-dark">
 						<div class="col">
 							<!-- 갯수 가져와야함-->
-							<span>총 ${count }개의 수강중인 강의가 있습니다.</span>
+							<span>온라인 강의</span>
 						</div>
 					</div>
 
@@ -64,6 +64,7 @@
 
 					<!-- 반복문 돌려야함 -->
 					<c:forEach items="${myCourseDataList }" var="myCourseData">
+						<c:if test="${myCourseData.orderVo.order_date != myCourseData.expire}">
 						<div class="row py-3 text-center"
 							style="border-bottom: 1px solid #bdbdbd;">
 							<div class="col">
@@ -93,8 +94,66 @@
 								
 							</div>
 						</div>
+						</c:if>
 					</c:forEach>
+				<div class="row mt-5 border-bottom border-3 py-2 border-dark">
+						<div class="col">
+							<!-- 갯수 가져와야함-->
+							<span>오프라인 강의</span>
+						</div>
+					</div>
 
+					<div class="row py-3 text-center"
+						style="border-bottom: 1px solid #bdbdbd;">
+						<div class="col-4">
+							<span>강의명</span>
+						</div>
+						<div class="col-3">
+							<span>강의 장소</span>
+						</div>
+						<div class="col-2">
+							<span>강사명</span>
+						</div>
+						<div class="col-3 text-start ps-5">
+							<span>강의 시작일</span>
+						</div>
+					</div>
+					<c:forEach items="${myCourseDataList }" var="myCourseData">
+						<c:if test="${myCourseData.orderVo.order_date == myCourseData.expire}">
+						<div class="row py-3 text-center"
+							style="border-bottom: 1px solid #bdbdbd;">
+							<div class="col">
+								<div class="row targetCourse">
+									<div class="col-4 text-start">
+										<span>${myCourseData.courseVo.course_title }</span>
+									</div>
+									<div class="col-3 text-start">
+										<span>${myCourseData.courseVo.course_map } ${myCourseData.courseVo.course_mapDetail }</span>
+									</div>
+									<div class="col-2">
+										<span>${myCourseData.teacherName }</span>
+									</div>
+									<div class="col-2 text-start  ps-5">
+										<span><fmt:formatDate value="${myCourseData.lectureDayList[0].lectureDay_date }"
+												pattern="yyyy-MM-dd" /></span>
+									</div>
+									<div class="col-1">
+										<fmt:formatDate value="${myCourseData.lectureDayList[0].lectureDay_date  }" pattern="yyyy-MM-dd" var="expire"/>
+									<c:choose>
+										<c:when test="${expire <= now }">
+											<button onclick="targetOff(this)" value="${myCourseData.courseVo.course_no }">&#9661;</button>
+										</c:when>
+										<c:otherwise>
+											<p>만료</p>
+										</c:otherwise>
+									</c:choose>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+						</c:if>
+					</c:forEach>
 				</div>
 				<div class="col-1"></div>
 			</div>
@@ -108,7 +167,100 @@
 	  const inputUrl = document.querySelector("#inputUrl");
 	  inputUrl.value = url.substring(url.indexOf(/bseven/)+8);
   }
+	
+  function targetOff(event) {
+	  var parentBox = event.parentNode.parentNode
+	  var course_no = event.getAttribute("value");
+	  
+	  if(parentBox.lastElementChild.getAttribute("id") == "off") {
+		  parentBox.lastElementChild.remove();
+	  } else {
+		  
+		  var xhr = new XMLHttpRequest();
+		  xhr.onreadystatechange = function() {
+			  if(xhr.readyState==4 && xhr.status==200) {
+				  const map = JSON.parse(xhr.responseText);
+	    		  const videoSection = document.createElement("div");
+	    		  videoSection.setAttribute("class", "row");
+	    		  videoSection.classList.add("class", "mt-3");
+	    		  videoSection.classList.add("class", "border");
+	    		  videoSection.classList.add("class", "border-1");
+	    		  videoSection.setAttribute("id", "off")
 
+	    		      const videoDiv = document.createElement("div");
+	    		      videoDiv.setAttribute("class", "col");
+
+	    		          const videoHead =  document.createElement("div");
+	    		          videoHead.setAttribute("class", "row");
+	    		          videoHead.classList.add("class", "p-3");
+	    		          videoHead.classList.add("class", "text-start");
+
+	    		              const headNo = document.createElement("div");
+	    		              headNo.setAttribute("class", "col");
+	    		                  const headNoSpan = document.createElement("span");
+	    		                  headNoSpan.innerText = "No.";
+	    		                  headNo.append(headNoSpan);
+
+	    		              const headTitle = document.createElement("div");
+	    		              headTitle.setAttribute("class", "col-7");
+	    		              headTitle.classList.add("class", "text-center");
+	    		                  const headTitleSpan = document.createElement("span");
+	    		                  headTitleSpan.innerText = "강의주제";
+	    		                  headTitle.append(headTitleSpan);
+
+
+	    		              const headShow = document.createElement("div");
+	    		              headShow.setAttribute("class", "col");
+	    		                  const headShowSpan = document.createElement("span");
+	    		                  headShowSpan.innerText = "강연일";
+	    		                  headShow.append(headShowSpan);
+	    		          
+
+	    		          videoHead.append(headNo, headTitle, headShow);
+	    		          videoDiv.append(videoHead);
+	    		          videoSection.append(videoDiv);
+
+	    		          for(var j=0; j<map.lectureDayList.length; j++){
+	    		          
+	    		          let videoBody = document.createElement("div");
+	    		          videoBody.setAttribute("class", "row");
+	    		          videoBody.classList.add("class", "text-start");
+	    		          videoBody.classList.add("class", "border-top");
+	    		          videoBody.classList.add("class", "py-3");
+
+	    		              let bodyNo = document.createElement("div");
+	    		              bodyNo.setAttribute("class", "col");
+	    		              bodyNo.classList.add("class", "ms-3");
+	    		                  let bodyNoSpan = document.createElement("div");
+	    		                  bodyNoSpan.innerText = j + 1 + ".";
+	    		                  bodyNo.append(bodyNoSpan);
+
+	    		              let bodyTitle = document.createElement("div");
+	    		              bodyTitle.setAttribute("class", "col-7");
+	    		                  let bodyTitleSpan = document.createElement("div");
+	    		                  bodyTitleSpan.innerText = map.lectureDayList[j].lectureDay_title;
+	    		                  bodyTitle.append(bodyTitleSpan);
+
+	    		              let bodyShow = document.createElement("div");
+	    		              bodyShow.setAttribute("class", "col");
+	    		                  let bodyShowA = document.createElement("div");
+	    		                  let date = new Date(map.lectureDayList[j].lectureDay_date).toLocaleDateString();
+	    		                  bodyShowA.innerText = date + " " + map.lectureDayList[j].lectureDay_hhmm;
+	    		                  bodyShow.append(bodyShowA);
+
+	    		          videoBody.append(bodyNo, bodyTitle, bodyShow);
+	    		          videoDiv.appendChild(videoBody);
+	    		          }
+	    		          parentBox.append(videoSection); 
+			  }
+		  }
+		  xhr.open("get", "getCourseLectureDay?course_no=" + course_no, true);
+		  xhr.send();
+	  }
+	  
+  }
+  
+  
 
   // 여러개의 컨텐츠가 있을 때 해당 컨텐츠를 클릭하면 나머지는 닫고 해당된 것만 열기
   const showinfo = document.querySelectorAll(".showinfo");

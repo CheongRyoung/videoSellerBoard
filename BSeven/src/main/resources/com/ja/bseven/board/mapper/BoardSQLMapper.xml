@@ -18,9 +18,22 @@
 		select b7_course_seq.nextval from dual
 	</select>
 	
+	<!-- 오프라인강의 수강일 넣기 -->
+	<insert id="insertCourseLectureDayVo">
+		insert into b7_course_lectureDay values (b7_course_lectureDay_seq.nextval, #{course_no}, #{lectureDay_title}, #{lectureDay_date}, #{lectureDay_hhmm})
+	</insert>
+	
+	<select id="getcourseDayList" resultType="com.ja.bseven.vo.CourseLectureDayVo">
+		select * from b7_course_lectureDay where course_no = #{course_no}
+	</select>
+	
 	<!--  강의 정보 넣기 -->
 	<insert id="insertCourseInfo">
-		insert into b7_course values ( #{course_no}, #{teacher_no}, #{course_title}, #{course_price} ,#{course_period}, #{course_content}, 0, sysdate)
+		insert into b7_course values ( #{course_no}, #{teacher_no}, #{course_title}, #{course_price} ,#{course_period}, #{course_content}, 0, sysdate, null, null)
+	</insert>
+	
+	<insert id="insertOfflineCourseInfo">
+		insert into b7_course values ( #{course_no}, #{teacher_no}, #{course_title}, #{course_price} , null, #{course_content}, 0, sysdate, #{course_map}, #{course_mapDetail})
 	</insert>
 	
 	<!--  강의 카테고리 넣기  -->

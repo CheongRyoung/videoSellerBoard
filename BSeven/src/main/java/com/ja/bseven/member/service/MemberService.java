@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.ja.bseven.vo.CartVo;
 import com.ja.bseven.vo.CategoryListVo;
 import com.ja.bseven.vo.CourseCategory;
 import com.ja.bseven.vo.CourseImage;
+import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.MemberVo;
@@ -170,8 +172,15 @@ public class MemberService {
 				memberSQLMapper.deleteCartVo(cart_no[i]);
 			} else {
 				CourseVo courseVo = boardSQLMapper.getCourseInfo(course_no[i]);
-				memberSQLMapper.updateOrder(course_no[i], member_no, courseVo.getCourse_period());
-				memberSQLMapper.deleteCartVo(cart_no[i]);
+				OrderVo orderVo = memberSQLMapper.getOrderVoByCourseNoMemberNo(course_no[i], member_no);
+				long expire = orderVo.getOrder_date().getTime() + (courseVo.getCourse_period() * 1000 * 60 * 60 * 24);
+				long now = System.currentTimeMillis();
+				if(expire < now) {
+					memberSQLMapper.updateOrderNow(course_no[i], member_no);
+				} else {
+					memberSQLMapper.updateOrder(course_no[i], member_no, courseVo.getCourse_period());
+					memberSQLMapper.deleteCartVo(cart_no[i]);
+				}
 			}
 		}
 	}
@@ -254,6 +263,9 @@ public class MemberService {
 					categoryName.add(boardSQLMapper.getCategory(courseCategory.getCategory_no()).getCategory_name());
 				}
 				
+				List<CourseLectureDayVo> lectureDayList = boardSQLMapper.getcourseDayList(courseVo.getCourse_no());
+				
+				map.put("lectureDayList", lectureDayList);
 				map.put("replyCount", replyCount);
 				map.put("replyVo", replyVo);
 				map.put("orderVo", orderVo);

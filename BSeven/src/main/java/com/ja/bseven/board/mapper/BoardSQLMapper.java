@@ -2,12 +2,14 @@ package com.ja.bseven.board.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.ja.bseven.vo.CategoryListVo;
 import com.ja.bseven.vo.CourseCategory;
 import com.ja.bseven.vo.CourseImage;
+import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.ReplyVo;
@@ -23,6 +25,7 @@ public interface BoardSQLMapper {
 	
 	// 강의 정보 insert
 	public void insertCourseInfo(CourseVo courseVo);
+	public void insertOfflineCourseInfo(CourseVo courseVo);
 	
 	// 강의 카테고리 insert
 	public void insertCourseCategory(CourseCategory courseCategory);
@@ -40,6 +43,10 @@ public interface BoardSQLMapper {
 	public void insertCourseVideo(CourseVideo courseVideo);
 	public ArrayList<CourseVideo> getCourseVideo(int course_no);
 	public void deleteCourseVideo(int course_no);
+	
+	// 주제별 강의날짜
+	public void insertCourseLectureDayVo(CourseLectureDayVo courseLectureDayVo);
+	public ArrayList<CourseLectureDayVo> getcourseDayList(int course_no);
 	
 	// 조회수
 	public void addCourseViewCount(int course_no);

@@ -2,6 +2,7 @@ package com.ja.bseven.member.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -10,8 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ja.bseven.board.service.BoardService;
 import com.ja.bseven.member.service.MemberService;
 import com.ja.bseven.vo.CartVo;
+import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.MemberVo;
 import com.ja.bseven.vo.OrderVo;
@@ -23,6 +26,9 @@ public class RestMemberController {
 	
 	@Autowired
 	private MemberService memberService;
+	
+	@Autowired
+	private BoardService boardService;
 	
 	@RequestMapping("idcheck")
 	public HashMap<String, Object> idcheck(String member_id) {
@@ -90,15 +96,19 @@ public class RestMemberController {
 		cartVo.setCourse_no(course_no);
 		
 		MemberVo memberVo = (MemberVo) session.getAttribute("sessionUser");
-		cartVo.setMember_no(memberVo.getMember_no());
-		if(memberService.checkCartVo(cartVo)) {
-			data.put("result", "true");
+		if (memberVo == null) {
+			data.put("login", "false");
 			return data;
 		} else {
-			data.put("result", "false");
-			return data;
+			cartVo.setMember_no(memberVo.getMember_no());
+			if(memberService.checkCartVo(cartVo)) {
+				data.put("result", "true");
+				return data;
+			} else {
+				data.put("result", "false");
+				return data;
+			}
 		}
-		
 	}
 	
 	@RequestMapping("addCartProcess")
@@ -228,6 +238,15 @@ public class RestMemberController {
 		}
 		boolean check =  memberService.checkWishlistVo(wishlistVo);
 		
+		return data;
+	}
+	
+	@RequestMapping("getCourseLectureDay")
+	public HashMap<String, Object> getCourseLectureDay(int course_no) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		
+		List<CourseLectureDayVo> lectureDayList = boardService.getCourseLectureDayListBycourseNo(course_no);
+		data.put("lectureDayList", lectureDayList);
 		return data;
 	}
 }

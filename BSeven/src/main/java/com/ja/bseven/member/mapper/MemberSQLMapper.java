@@ -52,7 +52,13 @@ public interface MemberSQLMapper {
 			@Param("member_no") int member_no,
 			@Param("course_period") int course_period			
 			);
-	
+	public OrderVo getOrderVoByCourseNoMemberNo(
+			@Param("course_no") int course_no, 
+			@Param("member_no") int member_no);
+	public void updateOrderNow(
+			@Param("course_no") int course_no, 
+			@Param("member_no") int member_no
+			);
 	
 	// 위시리스트 관리
 	public void insertWishlistVo(WishlistVo wishlistVo);

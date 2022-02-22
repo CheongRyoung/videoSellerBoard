@@ -19,11 +19,10 @@
 <title>Document</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script
-	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 	integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 	crossorigin="anonymous"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bb99d8cd30c99f04d4597f0c98a11482&libraries=services"></script>
 <script>
 // 별점 구현
 function color(num) {
@@ -71,7 +70,7 @@ function color(num) {
    window.addEventListener("DOMContentLoaded", e => {
    	reviewRefresh();
    	checkCart();
-    })
+    });
 </script>
 <style>
 .star {
@@ -88,6 +87,7 @@ function color(num) {
 }
 </style>
 <script type="text/javascript" src="/bseven/resources/js/category.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bb99d8cd30c99f04d4597f0c98a11482"></script>
 </head>
 <body>
 	<div style="max-width: 1200px; margin: 0 auto;">
@@ -125,9 +125,18 @@ function color(num) {
 									</div>
 									<div class="row mb-3">
 										<div class="col">
-											<span>수강기간: </span><span><fmt:formatNumber
+											<c:choose>
+												<c:when test="${courseData.courseVo.course_period != 0 }">
+													<span>수강기간: </span><span><fmt:formatNumber
 													value="${courseData.courseVo.course_period }"
 													pattern="#,###" />일</span>
+												</c:when>
+												<c:otherwise>
+													<span>강연시작일: </span><span><fmt:formatDate
+													value="${courseData.courseDayList[0].lectureDay_date }"
+													pattern="yyyy-MM-dd" /></span><span> ${courseData.courseDayList[0].lectureDay_hhmm }</span>
+												</c:otherwise>
+											</c:choose>
 										</div>
 									</div>
 									<div class="row mb-3">
@@ -160,13 +169,37 @@ function color(num) {
 									<i class="bi bi-bar-chart-line fs-3 m-3" onclick="openChart()"></i>
 								</div>
 								<div class="col">
-									<button onclick="addCart()" data-bs-toggle="tooltip" data-bs-original-title="Hooray!" class="btn btn-outline-primary" id="cartBox">장바구니</button>
+									<button onclick="addCart()" data-bs-toggle="tooltip" data-bs-original-title="로그인 후 이용해주세요!" class="btn btn-outline-primary" id="cartBox">장바구니</button>
 									<button class="btn btn-outline-primary" onclick="orderMoal()">구매하기</button>
 								</div>
 							</div>
 						</div>
 
 					</div>
+					<c:if test="${courseData.courseVo.course_period == 0 }">
+						<div class="row mt-3" style="border-bottom: 1px solid #bdbdbd;">
+							<div class="col p-2">
+								<i class="bi bi-calendar-check"></i> <span>강연스케쥴</span>
+							</div>
+						</div>
+						<c:forEach items="${courseData.courseDayList}" var="courseDay">
+						<div class="row mt-3">
+						<div class="col-3">
+						<span>강의일: </span><span><fmt:formatDate value="${courseDay.lectureDay_date }" pattern="yyyy-MM-dd"/> ${courseDay.lectureDay_hhmm }</span>
+						</div>
+						<div class="col">
+						<span>강의주제: </span><span>${courseDay.lectureDay_title }</span>
+						</div>
+						</div>
+						<div class="row">
+							<div class="col">
+								<div class="row mt-3"><div class="col">강의 장소: ${courseData.courseVo.course_map} ${courseData.courseVo.course_mapDetail}</div></div>
+								<div class="row"><div class="col"><div id="map" style="width:500px;height:400px;"></div></div></div>
+								
+							</div>
+						</div>
+					</c:forEach>
+					</c:if>
 					<div class="row mt-5">
 						<div class="col" style="border: 1px solid #bdbdbd">
 							<h4 class="m-5">${courseData.courseVo.course_content }</h4>
@@ -189,24 +222,64 @@ function color(num) {
 			<jsp:include page="../commons/global_footer.jsp"></jsp:include>
 		</div>
 	</div>
-
 	<jsp:include page="../commons/modalData.jsp"></jsp:include>
 
+<script type="text/javascript">
 
-	<script type="text/javascript">
-	
-	var myModalEl = document.querySelector('#exampleModal');
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+mapOption = {
+    center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+    level: 3 // 지도의 확대 레벨
+};  
+
+//지도를 생성합니다    
+var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+//주소-좌표 변환 객체를 생성합니다
+var geocoder = new kakao.maps.services.Geocoder();
+
+//주소로 좌표를 검색합니다
+geocoder.addressSearch('${courseData.courseVo.course_map}', function(result, status) {
+
+// 정상적으로 검색이 완료됐으면 
+ if (status === kakao.maps.services.Status.OK) {
+
+    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+    // 결과값으로 받은 위치를 마커로 표시합니다
+    var marker = new kakao.maps.Marker({
+        map: map,
+        position: coords
+    });
+
+    // 인포윈도우로 장소에 대한 설명을 표시합니다
+    var infowindow = new kakao.maps.InfoWindow({
+        content: '<div style="width:150px;text-align:center;padding:6px 0;">강연장소</div>'
+    });
+    infowindow.open(map, marker);
+
+    // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+    map.setCenter(coords);
+} 
+});    
+</script>
+
+<script type="text/javascript">
+var myModalEl = document.querySelector('#exampleModal');
 	myModalEl.addEventListener('hidden.bs.modal', function (event) {
 		var modalBox = document.getElementById("modalBox")
 		modalBox.innerHTML = "";
-		})	
+		});	
 	
 	var cart_no_arr = new Array();
 	var course_no_arr = new Array();
 	var starNum = "";
 	var courseNum = ${courseData.courseVo.course_no };
-
+	
 	function reviewRefresh() {
+		
+		
+		
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 			if(xhr.readyState==4&&xhr.status){
@@ -282,11 +355,6 @@ function color(num) {
 		
 		xhr.open("get", "./reviewRefresh?course_no="+ ${courseData.courseVo.course_no }, true);
 		xhr.send();
-	}
-	
-	function hideModal(){
-		var modal = bootstrap.Modal.getInstance(myModalEl);
-		modal.hide();
 	}
 	
 	function orderMoal(){
@@ -385,7 +453,6 @@ function color(num) {
 					alert("오류가 발생했습니다.")
 				}
 			}
-			location.reload();
 		}
 		xhr.open("post", "../member/orderProcess", true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
@@ -574,10 +641,12 @@ function color(num) {
 			xhr.onreadystatechange = function() {
 				if(xhr.readyState==4&&xhr.status==200){
 					var data = JSON.parse(xhr.responseText);
-					if(data.result == "true") {
-						cartBox.setAttribute("data-bs-original-title", "장바구니에 담겨있습니다.");
-					} else {
-						cartBox.setAttribute("data-bs-original-title", "장바구니에 담아보세요!");
+					if(data.login != 'false'){
+						if(data.result == "true") {
+							cartBox.setAttribute("data-bs-original-title", "장바구니에 담겨있습니다.");
+						} else {
+							cartBox.setAttribute("data-bs-original-title", "장바구니에 담아보세요!");
+						}
 					}
 				}
 			}

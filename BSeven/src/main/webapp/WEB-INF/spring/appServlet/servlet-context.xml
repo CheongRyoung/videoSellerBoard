@@ -52,6 +52,7 @@
 			<exclude-mapping path="/member/loginFail"/>
 			<exclude-mapping path="/member/addCartProcess"/>
 			<exclude-mapping path="/member/directOrder"/>
+			<exclude-mapping path="/member/checkCartProcess"/>
 			<beans:bean class="com.ja.bseven.interceptor.AuthInterceptor"></beans:bean>
 		</interceptor>
 		

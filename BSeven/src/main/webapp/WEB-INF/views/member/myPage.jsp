@@ -125,6 +125,7 @@ function color(num) {
                                 </div>
                                 <div class="col text-end">
                                     <a href="/bseven/board/courseUploadPage">강의 등록</a>
+                                    <a href="/bseven/board/offCourseUploadPage">오프라인 강의 등록</a>
                                 </div>
                             </div>
                            <c:forEach items="${myUploadDataList }" var="myCourseData">

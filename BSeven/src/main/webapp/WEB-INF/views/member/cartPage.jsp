@@ -80,6 +80,9 @@
 	  const inputUrl = document.querySelector("#inputUrl");
 	  inputUrl.value = url.substring(url.indexOf(/bseven/)+8);
   }
+  
+  
+  
   var inputList = document.querySelectorAll("input[name='cart_no']");
   var sales = document.querySelectorAll(".sale")
   const totals = document.querySelector("#cartTotalSales");

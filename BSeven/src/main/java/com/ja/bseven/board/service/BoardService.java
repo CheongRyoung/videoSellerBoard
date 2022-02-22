@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import com.ja.bseven.member.mapper.MemberSQLMapper;
 import com.ja.bseven.vo.CategoryListVo;
 import com.ja.bseven.vo.CourseCategory;
 import com.ja.bseven.vo.CourseImage;
+import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.MemberVo;
@@ -38,8 +40,8 @@ public class BoardService {
 	public void insertCategory(
 			CourseVo courseVo,
 			int[] category_nos,
-			ArrayList<CourseImage> courseImages,
-			ArrayList<CourseVideo> courseVideos,
+			List<CourseImage> courseImages,
+			List<CourseVideo> courseVideos,
 			int member_no) {
 		
 		int course_no = boardSQLMapper.getCourseNum();
@@ -72,16 +74,43 @@ public class BoardService {
 		
 	}
 	
+	public void offCourseUploadProcess(CourseVo courseVo, List<CourseLectureDayVo> courseLectureDayVoList, int[] categoryNoList, List<CourseImage> imageList, int memberNo) {
+		
+		// 강의 넘버 get
+		int courseNo = boardSQLMapper.getCourseNum();
+		courseVo.setCourse_no(courseNo);
+		// 티처넘버 get
+		courseVo.setTeacher_no(memberSQLMapper.getTeacherNoByMemberno(memberNo).getTeacher_no());
+		boardSQLMapper.insertOfflineCourseInfo(courseVo);
+		
+		// 강의 등록시 카테고리 별도 db
+		for(int categoryNo : categoryNoList) {
+			CourseCategory courseCategory = new CourseCategory(0, courseNo, categoryNo);
+			boardSQLMapper.insertCourseCategory(courseCategory);
+		}
+		
+		// 강의 이미지 별도 등록
+		for(CourseImage image : imageList) {
+			image.setCourse_no(courseNo);
+			boardSQLMapper.insertCourseImage(image);
+		}
+		// 강의 날짜 별도 등록
+		for(CourseLectureDayVo courseLectureDayVo : courseLectureDayVoList) {
+			courseLectureDayVo.setCourse_no(courseNo);
+			boardSQLMapper.insertCourseLectureDayVo(courseLectureDayVo);
+		}
+	}
+	
 	// 강의 삭제 유효성 검사
 	public boolean deleteCourse(int course_no) {
-		ArrayList<OrderVo> orderListByCourse_no = memberSQLMapper.getOrderListByCourse_no(course_no);
+		List<OrderVo> orderListByCourse_no = memberSQLMapper.getOrderListByCourse_no(course_no);
 		CourseVo courseVo = boardSQLMapper.getCourseInfo(course_no);
-		
+		long now = System.currentTimeMillis();
 		boolean check = true;
 		for(OrderVo orderVo : orderListByCourse_no) {
 			Date orderDate = orderVo.getOrder_date();
 			long expire = orderDate.getTime() + (courseVo.getCourse_period() *24*60*60*1000);
-			long now = System.currentTimeMillis();
+			
 			if (expire > now) {
 				check = false;
 				break;
@@ -117,6 +146,9 @@ public class BoardService {
 	public HashMap<String, Object> getCourseInfo(int course_no) {
 		HashMap<String, Object> courseData = new HashMap<String, Object>();
 		courseData.put("courseVo", boardSQLMapper.getCourseInfo(course_no));
+		if(boardSQLMapper.getCourseInfo(course_no).getCourse_period() == 0) {
+			courseData.put("courseDayList", boardSQLMapper.getcourseDayList(course_no));
+		}
 		
 		int teacher_no = boardSQLMapper.getCourseInfo(course_no).getTeacher_no();
 		String teacher_name = memberSQLMapper.getTeacherName(teacher_no).getMember_nickname();
@@ -126,7 +158,8 @@ public class BoardService {
 		courseData.put("image", courseImageList.get(0).getCourse_image_url());
 		
 		ArrayList<CourseCategory> courseCategoryList = boardSQLMapper.getCourseCategoryList(course_no);
-		ArrayList<String> categoryName = new ArrayList<String>();
+		List<String> categoryName = new ArrayList<>();
+				
 		for (CourseCategory courseCategory : courseCategoryList) {
 			categoryName.add(boardSQLMapper.getCategory(courseCategory.getCategory_no()).getCategory_name());
 			
@@ -223,5 +256,10 @@ public class BoardService {
 		data.put("ageMaleDataList", boardSQLMapper.getChartOrderByGenderM(course_no));
 		data.put("ageFemaleDataList", boardSQLMapper.getChartOrderByGenderF(course_no));
 		return data;
+	}
+	
+	public List<CourseLectureDayVo> getCourseLectureDayListBycourseNo(int course_no) {
+		
+		return boardSQLMapper.getcourseDayList(course_no);
 	}
 }

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ja.bseven.board.service.BoardService;
+import com.ja.bseven.board.util.FolderCreater;
 import com.ja.bseven.member.service.MemberService;
 import com.ja.bseven.vo.CategoryListVo;
 import com.ja.bseven.vo.CourseImage;
+import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVideo;
 import com.ja.bseven.vo.CourseVo;
 import com.ja.bseven.vo.MemberVo;
@@ -70,15 +74,6 @@ public class BoardController {
 			MultipartFile[] thumbnail,
 			HttpSession session) {
 		
-		String folder = "C:/uploadFolder2/";
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
-		String folderPath = sdf.format(date);
-		
-		File todayFolder = new File(folder+folderPath);
-		if(!todayFolder.exists()) {
-			todayFolder.mkdirs();
-		}
 		
 		// 이미지와 동영상을 담을 ArrayList 생성
 		ArrayList<CourseImage> courseImages = new ArrayList<CourseImage>();
@@ -86,24 +81,25 @@ public class BoardController {
 		
 		// video 변환과 트랜스퍼투
 		for (int i=0; i<coursevideo.length; i++) {
-			CourseVideo courseVideo = new CourseVideo();
+			CourseVideo courseVideo1 = new CourseVideo();
 			if( !coursevideo[i].isEmpty()) {
 				UUID uuid = UUID.randomUUID();
 				String randomName = uuid.toString() + "_" + System.currentTimeMillis();
 				String ext = coursevideo[i].getOriginalFilename().substring(coursevideo[i].getOriginalFilename().lastIndexOf("."));
 				randomName = randomName + ext;
 				
-				courseVideo.setCourse_video_url(folderPath+randomName);
+				courseVideo1.setCourse_video_url(FolderCreater.getCreateFolder()+randomName);
 				try {
-					coursevideo[i].transferTo(new File(folder+folderPath+randomName));
+					coursevideo[i].transferTo(new File(FolderCreater.uploadfolder+FolderCreater.getCreateFolder()+randomName));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				courseVideo1.setCourse_video_originalfilename(coursevideo[i].getOriginalFilename());
+				courseVideo1.setCourse_video_title(courseTitle[i]);
+				courseVideos.add(courseVideo1);
+				System.out.println(coursevideo[i].getOriginalFilename() + " 전송완료");
 			}
-			courseVideo.setCourse_video_originalfilename(coursevideo[i].getOriginalFilename());
-			courseVideo.setCourse_video_title(courseTitle[i]);
-			courseVideos.add(courseVideo);
-			System.out.println(coursevideo[i].getOriginalFilename() + " 전송완료");
+			
 		}
 		
 		// 이미지 변환과 트랜스퍼투
@@ -115,16 +111,17 @@ public class BoardController {
 				String ext = thumbnail[i].getOriginalFilename().substring(thumbnail[i].getOriginalFilename().lastIndexOf("."));
 				randomName = randomName + ext;
 				
-				coureImage.setCourse_image_url(folderPath+randomName);
+				coureImage.setCourse_image_url(FolderCreater.getCreateFolder()+randomName);
 				try {
-					thumbnail[i].transferTo(new File(folder+folderPath+randomName));
+					thumbnail[i].transferTo(new File(FolderCreater.uploadfolder+FolderCreater.getCreateFolder()+randomName));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				coureImage.setCourse_image_originalName(thumbnail[i].getOriginalFilename());
+				courseImages.add(coureImage);
+				System.out.println(thumbnail[i].getOriginalFilename() + " 전송완료");
 			}
-			coureImage.setCourse_image_originalName(thumbnail[i].getOriginalFilename());
-			courseImages.add(coureImage);
-			System.out.println(thumbnail[i].getOriginalFilename() + " 전송완료");
+
 		}
 		
 		
@@ -136,6 +133,15 @@ public class BoardController {
 		return "redirect: ./mainPage";
 	}
 	
+	@RequestMapping("offCourseUploadPage")
+	public String offCourseUploadPage(Model model) {
+		
+		ArrayList<CategoryListVo> categoryList = boardService.getCategoryList();
+		model.addAttribute("categoryList", categoryList);
+		
+		return "/board/offCourseUploadPage";
+	}
+	
 	@RequestMapping("deleteCourseProcess")
 	public String deleteCourseProcess(int course_no) {
 		if(boardService.deleteCourse(course_no)) {
@@ -143,9 +149,7 @@ public class BoardController {
 		} else {
 			return "board/deleteCourseFail";
 		}
-		
 	}
-	
 	
 	@RequestMapping("courseDetail")
 	public String courseDetail(
@@ -216,6 +220,12 @@ public class BoardController {
 		replyVo.setMember_no(memberVo.getMember_no());
 		boardService.insertReply(replyVo);
 		return "/board/completeReview";
+	}
+	
+	@RequestMapping("test")
+	public String test() {
+		
+		return "board/uploadTest";
 	}
 	
 }
