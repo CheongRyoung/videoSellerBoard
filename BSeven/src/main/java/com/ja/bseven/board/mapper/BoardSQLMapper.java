@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.ja.bseven.vo.CategoryListVo;
+import com.ja.bseven.vo.ChatRoomVo;
 import com.ja.bseven.vo.CourseCategory;
 import com.ja.bseven.vo.CourseImage;
 import com.ja.bseven.vo.CourseLectureDayVo;
@@ -85,6 +86,11 @@ public interface BoardSQLMapper {
 			@Param("course_no") int course_no,
 			@Param("member_no") int member_no
 			);
+	
+	// 채팅방
+	public void insertChatRoom(ChatRoomVo chatRoomVo);
+	public ArrayList<ChatRoomVo> getChatRoom();
+	public HashMap<String, Object> getNewChatContent(int room_no);
 	
 	// chart
 	public ArrayList<HashMap<String, Object>> getChartOrderByGenderM(int course_no);

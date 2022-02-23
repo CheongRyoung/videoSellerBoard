@@ -1,6 +1,7 @@
 package com.ja.bseven.board.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import com.ja.bseven.board.service.BoardService;
 import com.ja.bseven.board.util.FolderCreater;
 import com.ja.bseven.member.mapper.MemberSQLMapper;
 import com.ja.bseven.member.service.MemberService;
+import com.ja.bseven.vo.ChatRoomVo;
 import com.ja.bseven.vo.CourseImage;
 import com.ja.bseven.vo.CourseLectureDayVo;
 import com.ja.bseven.vo.CourseVo;
@@ -197,4 +199,35 @@ public class RestBoardController {
 		return data;
 	}
 	
+	@RequestMapping("insertChatRoom")
+	public HashMap<String, Object> insertChatRoom(MultipartFile room_img, String room_name, HttpSession session) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		ChatRoomVo chatRoomVo = new ChatRoomVo();
+		MemberVo sessionUser = (MemberVo) session.getAttribute("sessionUser");
+		if(room_img != null) {
+			UUID uuid = UUID.randomUUID();
+			String imgURL = uuid.toString() + "_" + room_img.getOriginalFilename() + "_" + System.currentTimeMillis();
+			String ext = room_img.getOriginalFilename().substring(room_img.getOriginalFilename().lastIndexOf("."));
+			imgURL = imgURL + ext;
+			
+			try {
+				room_img.transferTo(new File(FolderCreater.uploadfolder + FolderCreater.getCreateFolder() + imgURL));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			chatRoomVo.setRoom_img(FolderCreater.getCreateFolder() + imgURL);
+		}
+		chatRoomVo.setRoom_name(room_name);
+		chatRoomVo.setMember_no(sessionUser.getMember_no());
+		boardService.insertChatRoom(chatRoomVo);
+		return data;
+	}
+	
+	@RequestMapping("getChatRoom")
+	public HashMap<String, Object> getChatRoom() {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		ArrayList<HashMap<String, Object>> arrayList= boardService.getChatRoom();
+		data.put("chatRoomList", arrayList);
+		return data;
+	}
 }

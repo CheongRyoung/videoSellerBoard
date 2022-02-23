@@ -153,6 +153,18 @@
 		select * from b7_reply where course_no = #{course_no} and member_no = #{member_no}
 	</select>
 	
+	<!-- 채팅방 -->
+	<insert id="insertChatRoom">
+		insert into b7_chatRoom values (b7_chatRoom_seq.nextval, #{room_name}, #{room_img}, #{member_no}, sysdate)
+	</insert>
+	
+	<select id="getChatRoom" resultType="com.ja.bseven.vo.ChatRoomVo">
+		SELECT * FROM b7_chatRoom
+	</select>
+	
+	<select id="getNewChatContent" resultType="map">
+		SELECT * FROM (SELECT b1.*, rownum num FROM (SELECT * FROM b7_chatRoomContent WHERE room_no = #{room_no} ORDER BY content_no DESC) b1) cc WHERE num = 1
+	</select>
 	
 	<!--  chart data -->
 	

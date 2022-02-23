@@ -18,6 +18,7 @@
 <title>Document</title>
 </head>
 <body>
+	<i class="bi bi-chat-dots fs-1 position-fixed bottom-0 end-0 p-3" onclick="openChat()"></i>
 	<div style="max-width: 1200px; margin: 0 auto;">
 		<div class="container-fluid">
 			<!-- nav 영역 -->

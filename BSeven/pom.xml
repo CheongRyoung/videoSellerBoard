@@ -94,6 +94,11 @@
 				<version>${org.springframework-version}</version>
 			</dependency>
 			
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>spring-websocket</artifactId>
+			    <version>5.0.7.RELEASE</version>
+			</dependency>
 	<!-- ja : 외부 라이브러리 추가 설정 끝 -->
 	
 	

@@ -223,9 +223,9 @@ public class BoardController {
 	}
 	
 	@RequestMapping("test")
-	public String test() {
+	public String test1() {
 		
-		return "board/uploadTest";
+		return "board/test";
 	}
 	
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.ja.bseven.board.mapper.BoardSQLMapper;
 import com.ja.bseven.member.mapper.MemberSQLMapper;
 import com.ja.bseven.vo.CategoryListVo;
+import com.ja.bseven.vo.ChatRoomVo;
 import com.ja.bseven.vo.CourseCategory;
 import com.ja.bseven.vo.CourseImage;
 import com.ja.bseven.vo.CourseLectureDayVo;
@@ -261,5 +262,22 @@ public class BoardService {
 	public List<CourseLectureDayVo> getCourseLectureDayListBycourseNo(int course_no) {
 		
 		return boardSQLMapper.getcourseDayList(course_no);
+	}
+	
+	// 채팅방
+	public void insertChatRoom(ChatRoomVo chatRoomVo) {
+		boardSQLMapper.insertChatRoom(chatRoomVo);
+	}
+	
+	public ArrayList<HashMap<String, Object>> getChatRoom() {
+		ArrayList<HashMap<String, Object>> chatRoomDataList = new ArrayList<HashMap<String,Object>>();
+		ArrayList<ChatRoomVo> ChatRoomVoList = boardSQLMapper.getChatRoom();
+		for(ChatRoomVo chatRoomVo : ChatRoomVoList) {
+			HashMap<String, Object> chatData = new HashMap<String, Object>();
+			chatData.put("newChatContext", boardSQLMapper.getNewChatContent(chatRoomVo.getRoom_no()));
+			chatData.put("chatRoomVo", chatRoomVo);
+			chatRoomDataList.add(chatData);
+		}
+		return chatRoomDataList;
 	}
 }
